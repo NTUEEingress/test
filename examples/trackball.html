@@ -52,12 +52,12 @@
 			var container, stats;
 
 			var camera, controls, scene, renderer, raycaster;
-            
+            var num = 5;
             var mouse_click = new THREE.Vector2(),INTERSECTED_M,INTERSECTED_C;
 			var mouse_move = new THREE.Vector2();
             var x = [], y = [];
             var helicopter, velocity, destination;
-
+			
 			init();
 			animate();
 
@@ -89,8 +89,8 @@
 
                 var geometry_circle = new THREE.CircleGeometry(40,32);
 			    	
-		        for(var i=0;i<5;i++){
-					var mesh_circle = new THREE.Mesh(geometry_circle,new THREE.MeshBasicMaterial( { color: 'blue'} ));
+		        for(var i=0;i<num;i++){
+					var mesh_circle = new THREE.Mesh(geometry_circle,new THREE.MeshBasicMaterial( { color: 0xffffff} ));
 					x[i] = Math.random() * 480 - 240;
 					mesh_circle.position.x = x[i];
                     y[i] = Math.random() * 480 - 240;
@@ -176,7 +176,20 @@
 				mouse_click.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 			}
 			function animate() {
-
+                var close = false, x = 0;
+				if(!close){
+					for(var i=0;i<num;i++){
+						if(Math.pow((destination.x - x[i]),2) + Math.pow((destination.y - y[i]),2) < 400){
+						close = true;
+						x = i;
+						break;
+						}
+					}
+				}
+				
+				if(close){
+					scene.children[i];
+				}
 				requestAnimationFrame( animate );
 				controls.update();
                 //render_move();
