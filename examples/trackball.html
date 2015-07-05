@@ -91,12 +91,19 @@
 				scene.fog = new THREE.FogExp2( 0xcccccc, 0 );
 
                 var geometry_circle = new THREE.CircleGeometry(40,32);
-			    	
+				
 		        for(var i=0;i<num;i++){
 					var mesh_circle = new THREE.Mesh(geometry_circle,new THREE.MeshBasicMaterial( { color: 0xffffff} ));
-					x[i] = Math.random() * 480 - 240;
+					do {
+					  x[i] = Math.random() * 480 - 240;
+					  y[i] = Math.random() * 480 - 240;
+					  var flag = 0 ;
+					  for ( var j = 0 ; j < i ; j ++ ) {
+						if ( ( Math.pow( x[ i ] - x[ j ] , 2 ) + Math.pow( y[ i ] - y[ j ] , 2 ) ) < Math.pow( 200 , 2 ) ) flag = 1 ;
+					  }
+					  if ( flag == 0 ) { break ; }
+					} while ( true ) ;
 					mesh_circle.position.x = x[i];
-                    y[i] = Math.random() * 480 - 240;
 					mesh_circle.position.y = y[i];
 					controlled[i] = false;
 					
