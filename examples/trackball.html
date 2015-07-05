@@ -57,6 +57,9 @@
 			var mouse_move = new THREE.Vector2();
             var x = [], y = [];
             var helicopter, velocity, destination;
+			var closeToPortal = false, portalId;
+			var timeOrigin;
+			var controlled = [];
 			
 			init();
 			animate();
@@ -95,6 +98,7 @@
 					mesh_circle.position.x = x[i];
                     y[i] = Math.random() * 480 - 240;
 					mesh_circle.position.y = y[i];
+					controlled[i] = false;
 					
 					scene.add(mesh_circle);
 				}
@@ -176,26 +180,43 @@
 				mouse_click.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 			}
 			function animate() {
-                var close = false, x = 0;
-				if(!close){
-					for(var i=0;i<num;i++){
-						if(Math.pow((destination.x - x[i]),2) + Math.pow((destination.y - y[i]),2) < 400){
-						close = true;
-						x = i;
-						break;
-						}
-					}
-				}
+                changeColor();
 				
-				if(close){
-					scene.children[i];
-				}
 				requestAnimationFrame( animate );
 				controls.update();
                 //render_move();
 				render_click();
 			}
-			
+			function changeColor(){
+				if(!closeToPortal){
+					for(var i=0;i<num;i++){
+						if(!controlled[i] && Math.pow((destination.x - x[i]),2) + Math.pow((destination.y - y[i]),2) < 400){
+							
+							closeToPortal = true;
+							portalId = i;
+							timeOrigin = Date.now();
+							break;
+						}
+					}
+				}
+				
+				else{
+					if(Math.pow((destination.x - x[portalId]),2) + Math.pow((destination.y - y[portalId]),2) >= 400){
+						scene.children[portalId].material.color.setHex(0xffffff);
+						closeToPortal = false;
+					}
+					else{
+						if(Date.now() - timeOrigin >= 5000){
+							closeToPortal = false;
+							controlled[portalId] = true;
+						}
+						else{
+							var color = 0xffffff - 255 * (Date.now() - timeOrigin)/5000;
+							scene.children[portalId].material.color.setHex(color);
+						}
+					}
+				}
+			}
             function render_move(){
 				
 				//find intersection_move
