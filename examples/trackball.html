@@ -37,15 +37,15 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - trackball controls example</br>
 			MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
-            </br>Score : <p id="score"></p>
-        </div>
+			</br>Score : <p id="score"></p>
+		</div>
 
-	    <script src="../build/three.min.js"></script>
-        <script src="js/libs/stats.min.js"></script>
+		<script src="../build/three.min.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
-        <script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/Projector.js"></script>
 		<script src="js/Detector.js"></script>
-	    <script src="fonts/helvetiker_bold.typeface.js"></script>
+		<script src="fonts/helvetiker_bold.typeface.js"></script>
 
 		<script>
 
@@ -54,18 +54,18 @@
 			var container, stats;
 
 			var camera, controls, scene, renderer, raycaster,raycaster_move_heli;
-            var num = 5;
-            var mouse_click = new THREE.Vector2(),INTERSECTED_M,INTERSECTED_C;
+			var num = 5;
+			var mouse_click = new THREE.Vector2(),INTERSECTED_M,INTERSECTED_C;
 			var mouse_move = new THREE.Vector2();
-            var x = [], y = [];
-            var helicopter, velocity, destination, move_or_not = false;
+			var x = [], y = [];
+			var helicopter, velocity, destination, move_or_not = false;
 			var closeToPortal = false, portalId;
 			var timeOrigin;
 			var controlled = [];
-            var CountStart=0,NUM="6",NUMP="6",PID=5,Source=0;
-            var MAP = new Map();MAP.set("6",1);
-            //for score
-            var SCORES=0;
+			var CountStart=0,NUM="6",NUMP="6",PID=5,Source=0;
+			var MAP = new Map();MAP.set("6",1);
+			//for score
+			var SCORES=0;
 
 			init();
 			animate();
@@ -96,44 +96,45 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xcccccc, 0 );
 
-                var geometry_circle = new THREE.CircleGeometry(40,32);
-				
-		        for(var i=0;i<num;i++){
+				var geometry_circle = new THREE.CircleGeometry(40,32);
+
+				for(var i=0;i<num;i++){
 					var mesh_circle = new THREE.Mesh(geometry_circle,new THREE.MeshBasicMaterial( { color: 0xffffff} ));
 					do {
-					  x[i] = Math.random() * 480 - 240;
-					  y[i] = Math.random() * 480 - 240;
-					  var flag = 0 ;
-					  for ( var j = 0 ; j < i ; j ++ ) {
-						if ( ( Math.pow( x[ i ] - x[ j ] , 2 ) + Math.pow( y[ i ] - y[ j ] , 2 ) ) < Math.pow( 200 , 2 ) ) flag = 1 ;
-					  }
-					  if ( flag == 0 ) { break ; }
+						x[i] = Math.random() * 480 - 240;
+						y[i] = Math.random() * 480 - 240;
+						var flag = 0 ;
+						for ( var j = 0 ; j < i ; j ++ ) {
+							if ( ( Math.pow( x[ i ] - x[ j ] , 2 ) + Math.pow( y[ i ] - y[ j ] , 2 ) ) < Math.pow( 200 , 2 ) )
+								flag = 1 ;
+						}
+						if ( flag == 0 ) { break ; }
 					} while ( true ) ;
 					mesh_circle.position.x = x[i];
 					mesh_circle.position.y = y[i];
 					controlled[i] = false;
-					
+
 					scene.add(mesh_circle);
 				}
 
-			    raycaster = new THREE.Raycaster();
+				raycaster = new THREE.Raycaster();
 
-                // helicopter
-                var geometry_helicopter = new THREE.SphereGeometry(30,20,20);
-                var material_helicopter = new THREE.MeshLambertMaterial({color: 0x00ff00 });
-                helicopter = new THREE.Mesh(geometry_helicopter, material_helicopter);
-                velocity = 5;
+				// helicopter
+				var geometry_helicopter = new THREE.SphereGeometry(35,20,20);
+				var material_helicopter = new THREE.MeshLambertMaterial({color: 0x00ff00 });
+				helicopter = new THREE.Mesh(geometry_helicopter, material_helicopter);
+				velocity = 5;
 				helicopter.position.x = x[0];
-                helicopter.position.y = y[0];
-                helicopter.position.z = 35;
+				helicopter.position.y = y[0];
+				helicopter.position.z = 35;
 
-                scene.add(helicopter);
+				scene.add(helicopter);
 
-                destination = new THREE.Vector2(x[0], y[0]);
+				destination = new THREE.Vector2(x[0], y[0]);
 				//mouse
 				document.addEventListener('mousedown',onDocumentMouseDown,false);
 				document.addEventListener('mousemove',onDocumentMouseMove,false);
-				projector = new THREE.Projector();	
+				projector = new THREE.Projector();
 
 				// lights
 				light = new THREE.AmbientLight( 0x888888 );
@@ -145,7 +146,7 @@
 				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-                
+
 				container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
@@ -163,60 +164,60 @@
 				render();
 
 			}
-            //use this funtion to print Score
-            function PrintScore(){
-                SCORES++;
-                document.getElementById("score").innerHTML = SCORES;
-            }
-            
-            function CountDown(){
-                if(!MAP.has(NUM)){
-                    var textGeo = new THREE.TextGeometry( NUM , {
-                        size: 50,
-                        height: 12.5,
-                        curveSegments: 20,
-                        font: "helvetiker",
-                        weight: "bold",
-                        style: "normal",
-                        bevelThickness: 1.5, 
-                        bevelSize: 1,
-                        bevelEnabled: true
-                    });
-                    textGeo.computeBoundingBox();
-                    var textMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000  , specular: 0xffffff } );
-                    var mesh = new THREE.Mesh( textGeo, textMaterial );
-                    mesh.position.x = scene.children[PID].position.x-25;
-                    mesh.position.y = scene.children[PID].position.y-25;
-                    mesh.position.z = 100;
-                    mesh.castShadow = true;
-                    mesh.receiveShadow = true;
-                if(Source>0){scene.remove(scene.children[scene.children.length-1]);MAP.delete(NUMP);Source--;}
-                    scene.add( mesh );
-                    Source++;
-                    MAP.set(NUM,1);
-                    NUMP=NUM;
-                }
-            }
+			//use this funtion to print Score
+			function PrintScore(){
+				SCORES++;
+				document.getElementById("score").innerHTML = SCORES;
+			}
 
-            function Count(){
-                if(CountStart==1){
-                         if(Date.now()-timeOrigin<=1000){NUM="5";}                    
-                    else if(Date.now()-timeOrigin<=2000){NUM="4";}
-                    else if(Date.now()-timeOrigin<=3000){NUM="3";}
-                    else if(Date.now()-timeOrigin<=4000){NUM="2";}
-                    else if(Date.now()-timeOrigin<=5000){NUM="1";}
-                    else if(Date.now()-timeOrigin> 5000){
-                        NUM="6";
-                        CountStart=0;
-                        scene.remove(scene.children[scene.children.length-1]);
-                        MAP.delete(NUMP);
-                        Source--;NUMP="6";
-                    }
-                    CountDown();
-                }
-            }
+			function CountDown(){
+				if(!MAP.has(NUM)){
+					var textGeo = new THREE.TextGeometry( NUM , {
+						size: 50,
+						height: 12.5,
+						curveSegments: 20,
+						font: "helvetiker",
+						weight: "bold",
+						style: "normal",
+						bevelThickness: 1.5, 
+						bevelSize: 1,
+						bevelEnabled: true
+					});
+					textGeo.computeBoundingBox();
+					var textMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000  , specular: 0xffffff } );
+					var mesh = new THREE.Mesh( textGeo, textMaterial );
+					mesh.position.x = scene.children[PID].position.x-25;
+					mesh.position.y = scene.children[PID].position.y-25;
+					mesh.position.z = 100;
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
+					if(Source>0){scene.remove(scene.children[scene.children.length-1]);MAP.delete(NUMP);Source--;}
+					scene.add( mesh );
+					Source++;
+					MAP.set(NUM,1);
+					NUMP=NUM;
+				}
+			}
 
-            
+			function Count(){
+				if(CountStart==1){
+					if(Date.now()-timeOrigin<=1000){NUM="5";}
+					else if(Date.now()-timeOrigin<=2000){NUM="4";}
+					else if(Date.now()-timeOrigin<=3000){NUM="3";}
+					else if(Date.now()-timeOrigin<=4000){NUM="2";}
+					else if(Date.now()-timeOrigin<=5000){NUM="1";}
+					else if(Date.now()-timeOrigin> 5000){
+						NUM="6";
+						CountStart=0;
+						scene.remove(scene.children[scene.children.length-1]);
+						MAP.delete(NUMP);
+						Source--;NUMP="6";
+					}
+					CountDown();
+				}
+			}
+
+
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -229,57 +230,57 @@
 				render();
 
 			}
-            function onDocumentMouseMove(event){
-			
+			function onDocumentMouseMove(event){
+
 				event.preventDefault();
-				
+
 				mouse_move.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 				mouse_move.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 			}
 			function onDocumentMouseDown( event ) {
 
 				event.preventDefault();
-				
+
 				console.log("Click.");
-				
+
 				mouse_click.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 				mouse_click.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 				//move helicopter
 				raycaster.setFromCamera(mouse_click,camera);
 				var intersect_click = raycaster.intersectObjects(scene.children)
-				
+
 				if ( intersect_click.length > 0 ) {
 					//helicopter move or not
 					destination.x = intersect_click[0].object.position.x;
 					destination.y = intersect_click[0].object.position.y;
 					move_or_not = true ;
 				}
-				
+
 			}
 			function animate() {
-                changeColor();
+				changeColor();
 				Count();
-                PrintScore();
+				PrintScore();
 				requestAnimationFrame( animate );
 				controls.update();
-                //render_move();
+				//render_move();
 				render_click();
 			}
 			function changeColor(){
 				if(!closeToPortal){
 					for(var i=0;i<num;i++){
 						if(!controlled[i] && Math.pow((helicopter.position.x - x[i]),2) + Math.pow((helicopter.position.y - y[i]),2) < 400){
-							
+
 							closeToPortal = true;
 							portalId = i;
 							timeOrigin = Date.now();
-                            CountStart=1;
-                            PID=i;
+							CountStart=1;
+							PID=i;
 							break;
 						}
 					}
 				}
-				
+
 				else{
 					if(Math.pow((helicopter.position.x - x[portalId]),2) + Math.pow((helicopter.position.y - y[portalId]),2) >= 400){
 						scene.children[portalId].material.color.setHex(0xffffff);
@@ -297,22 +298,22 @@
 					}
 				}
 			}
-            function render_move(){
-				
+			function render_move(){
+
 				//find intersection_move
 				raycaster.setFromCamera(mouse_move,camera);
 				var intersect_move = raycaster.intersectObjects(scene.children)
 
 				if ( intersect_move.length > 0 ) {
-					
+
 					if ( INTERSECTED_M ) INTERSECTED_M.material.color.setHex( INTERSECTED_M.currentHex );
 					console.log("10231654520");
 					INTERSECTED_M = intersect_move[ 0 ].object;
 					INTERSECTED_M.currentHex = INTERSECTED_M.material.color.getHex();
 					INTERSECTED_M.material.color.setHex( 0x00ff00 );
-				
+
 				}
-				
+
 				renderer.render(scene,camera);
 			}
 			function render_click(){
@@ -327,8 +328,8 @@
 					console.log(destination.x,destination.y);
 					//console.log(helicopter.position.x,helicopter.position.y);
 				}
-				
-				
+
+
 				renderer.render(scene,camera);
 			}
 			function render() {
