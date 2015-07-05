@@ -20,7 +20,6 @@
 <script src="js/THREEx.WindowResize.js"></script>
 
 <div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
-<button type="button"onclick="side_retire()">SIDE RETIRE</button>
 <script>
 /*
 	Three.js "tutorials by example"
@@ -192,22 +191,10 @@ function onDocumentMouseDown( event )
 		}
 		//intersects[ 0 ].object.geometry.colorsNeedUpdate = true;
 	}
-	for(int i=0;i<5;i++){
-		if(targetList[i].object.material.color.getHex())
-		
-	}
+	
 }
 
-function draw_lines(){
-	
-	var geometry_line = new THREE.Geometry();
-	var material_line = new THREE.LineBasicMaterial({color:'red'});
-	for(int i=0;i<5;i++){
-		if(targetList[i].object.material.color.getHex() == 0xff0000)
-		
-	}
-	
-}
+
 function toString(v) { return "[ " + v.x + ", " + v.y + ", " + v.z + " ]"; }
 
 function animate() 
