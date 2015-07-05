@@ -2,5 +2,5 @@
 
 using namespace std;
 int main(){
-	cout<<"Hellold.\n";
+	cout<<"Hellold.\n\n";
 }
