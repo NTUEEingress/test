@@ -39,12 +39,12 @@
 			MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
 		</div>
 
-		<script src="js/three.min.js"></script>
-
+	    <script src="../build/three.min.js"></script>
+        <script src="js/libs/stats.min.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
-
+        <script src="js/renderers/Projector.js"></script>
 		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		
 
 		<script>
 
@@ -52,7 +52,10 @@
 
 			var container, stats;
 
-			var camera, controls, scene, renderer;
+			var camera, controls, scene, renderer, raycaster;
+            
+            var mouse_click = new THREE.Vector2(),INTERSECTED_M,INTERSECTED_C;
+			var mouse_move = new THREE.Vector2();
 
 			var cross;
 
@@ -66,8 +69,8 @@
 
 				controls = new THREE.TrackballControls( camera );
 
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
+				controls.rotateSpeed = 1.2;
+				controls.zoomSpeed = 1.0;
 				controls.panSpeed = 0.8;
 
 				controls.noZoom = false;
@@ -85,31 +88,27 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
 
-				var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1);
-				var material =  new THREE.MeshLambertMaterial( { color:0xffffff, shading: THREE.FlatShading } );
+                var geometry_circle = new THREE.CircleGeometry(40,32);
+				
+		        for(var i=0;i<5;i++){
+					var mesh_circle = new THREE.Mesh(geometry_circle,new THREE.MeshBasicMaterial( { color: 'blue'} ));
+					
+					mesh_circle.position.x = Math.random() * 480 - 240;
+					mesh_circle.position.y = Math.random() * 480 - 240;
+					
+					scene.add(mesh_circle);
+				}	
 
-				for ( var i = 0; i < 500; i ++ ) {
-
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = ( Math.random() - 0.5 ) * 1000;
-					mesh.position.y = ( Math.random() - 0.5 ) * 1000;
-					mesh.position.z = ( Math.random() - 0.5 ) * 1000;
-					mesh.updateMatrix();
-					mesh.matrixAutoUpdate = false;
-					scene.add( mesh );
-
-				}
+			    raycaster = new THREE.Raycaster();
+				//mouse
+				document.addEventListener('mousedown',onDocumentMouseDown,false);
+				document.addEventListener('mousemove',onDocumentMouseMove,false);
+				projector = new THREE.Projector();	
 
 
 				// lights
 
-				light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 1, 1, 1 );
-				scene.add( light );
-
-				light = new THREE.DirectionalLight( 0x002288 );
-				light.position.set( -1, -1, -1 );
-				scene.add( light );
+				
 
 				light = new THREE.AmbientLight( 0x222222 );
 				scene.add( light );
@@ -121,6 +120,7 @@
 				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+                
 
 				container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
@@ -152,14 +152,63 @@
 				render();
 
 			}
+            function onDocumentMouseMove(event){
+			
+				event.preventDefault();
+				
+				mouse_move.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse_move.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+			}
+			function onDocumentMouseDown( event ) {
 
+				event.preventDefault();
+				
+				console.log("Click.");
+				
+				mouse_click.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse_click.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+			}
 			function animate() {
 
 				requestAnimationFrame( animate );
 				controls.update();
-
+                //render_move();
+				render_click();
 			}
+			
+            function render_move(){
+				
+				//find intersection_move
+				raycaster.setFromCamera(mouse_move,camera);
+				var intersect_move = raycaster.intersectObjects(scene.children)
 
+				if ( intersect_move.length > 0 ) {
+					
+					if ( INTERSECTED_M ) INTERSECTED_M.material.color.setHex( INTERSECTED_M.currentHex );
+					console.log("10231654520");
+					INTERSECTED_M = intersect_move[ 0 ].object;
+					INTERSECTED_M.currentHex = INTERSECTED_M.material.color.getHex();
+					INTERSECTED_M.material.color.setHex( 0x00ff00 );
+				
+				}
+				
+				renderer.render(scene,camera);
+			}
+			function render_click(){
+				raycaster.setFromCamera(mouse_click,camera);
+				var intersect_click = raycaster.intersectObjects(scene.children)
+
+				if ( intersect_click.length > 0 ) {
+					
+					INTERSECTED_C = intersect_click[ 0 ].object;
+					INTERSECTED_C.currentHex = INTERSECTED_C.material.color.getHex();
+					if(INTERSECTED_C.currentHex == 0xff0000) INTERSECTED_C.material.color.setHex( 0x0000ff );
+					else if(INTERSECTED_C.currentHex == 0x0000ff)INTERSECTED_C.material.color.setHex( 0xff0000 );
+					
+				}
+				
+				renderer.render(scene,camera);
+			}
 			function render() {
 
 				renderer.render( scene, camera );
