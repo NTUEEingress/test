@@ -208,7 +208,7 @@
 			function changeColor(){
 				if(!closeToPortal){
 					for(var i=0;i<num;i++){
-						if(!controlled[i] && Math.pow((destination.x - x[i]),2) + Math.pow((destination.y - y[i]),2) < 400){
+						if(!controlled[i] && Math.pow((helicopter.position.x - x[i]),2) + Math.pow((helicopter.position.y - y[i]),2) < 400){
 							
 							closeToPortal = true;
 							portalId = i;
@@ -219,7 +219,7 @@
 				}
 				
 				else{
-					if(Math.pow((destination.x - x[portalId]),2) + Math.pow((destination.y - y[portalId]),2) >= 400){
+					if(Math.pow((helicopter.position.x - x[portalId]),2) + Math.pow((helicopter.position.y - y[portalId]),2) >= 400){
 						scene.children[portalId].material.color.setHex(0xffffff);
 						closeToPortal = false;
 					}
