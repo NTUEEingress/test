@@ -37,9 +37,8 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - trackball controls example</br>
 			MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
-			</br>Score : <p id="score"></p>
-		</div>
-
+			</br>Score : <font id="score"></font>
+		</div>			
 		<script src="../build/three.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
@@ -55,6 +54,7 @@
 
 			var camera, controls, scene, renderer, raycaster,raycaster_move_heli;
 			var num = 5;
+			var nodeList = [];
 			var mouse_click = new THREE.Vector2(),INTERSECTED_M,INTERSECTED_C;
 			var mouse_move = new THREE.Vector2();
 			var x = [], y = [];
@@ -116,6 +116,7 @@
 					controlled[i] = false;
 
 					scene.add(mesh_circle);
+					nodeList.push(mesh_circle);
 				}
 
 				raycaster = new THREE.Raycaster();
@@ -144,7 +145,20 @@
 				// lights
 				light = new THREE.AmbientLight( 0xaaaaaa );
 				scene.add( light );
-
+				//Grid Plane
+				var size = 400,step = 50;
+				var geometry_plane = new THREE.Geometry();
+				var material_plane = new THREE.LineBasicMaterial({color:'white'});
+				
+				for(var i = -size;i<=size;i+=step){
+					geometry_plane.vertices.push( new THREE.Vector3( -size,i,-1 ) );
+					geometry_plane.vertices.push( new THREE.Vector3( size,i,-1) );
+					
+					geometry_plane.vertices.push( new THREE.Vector3(i,-size,-1));
+					geometry_plane.vertices.push( new THREE.Vector3(i,size,-1) );
+				}
+				var line = new THREE.Line( geometry_plane,material_plane,THREE.LinePieces );
+				scene.add(line);
 
 				// renderer
 				renderer = new THREE.WebGLRenderer();
@@ -173,7 +187,7 @@
 				SCORES++;
 				document.getElementById("score").innerHTML = SCORES;
 			}
-
+			//countdown
 			function CountDown(){
 				if(!MAP.has(NUM)){
 					var textGeo = new THREE.TextGeometry( NUM , {
@@ -249,7 +263,7 @@
 				mouse_click.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 				//move helicopter
 				raycaster.setFromCamera(mouse_click,camera);
-				var intersect_click = raycaster.intersectObjects(scene.children)
+				var intersect_click = raycaster.intersectObjects(nodeList)
 
 				if ( intersect_click.length > 0 ) {
 					//helicopter move or not
@@ -330,7 +344,6 @@
 					console.log(destination.x,destination.y);
 					//console.log(helicopter.position.x,helicopter.position.y);
 				}
-
 
 				renderer.render(scene,camera);
 			}
