@@ -200,8 +200,6 @@
 				render();
 
 				console.log("initialized");
-				console.log( scene.children[ outlineOffset ] ) ;
-
 			} //}}}
 			function reinit(){
 				
@@ -216,6 +214,9 @@
 				score = [0,0];
 				for(var i=0;i<num;i++){
 					portalColor[i] = 0;
+				}
+				for ( var i = 0 ; i < num ; i ++ ) {
+						scene.children[ outlineOffset + i].geometry = new THREE.RingGeometry( 40, 50, 32 , 8 , 0 , portalColor[ i ] / 300 * Math.PI * 2 ) ;
 				}
 				console.log("reinit called")
 			}	
