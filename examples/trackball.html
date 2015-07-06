@@ -333,6 +333,10 @@
 							if ( j == 0 && portalColor[ i ] < 300 ) portalColor[ i ] ++ ;
 							else if ( j == 1 && portalColor[ i ] > -300 ) portalColor[ i ] -- ;
 						}
+						else {
+							if ( j == 0 && portalColor[ i ] > 0 && portalColor[ i ] != 300) portalColor[ i ] -- ;
+							else if ( j == 1 && portalColor[ i ] < 0 && portalColor[ i ] != -300) portalColor[ i ] ++ ;
+						}
 					}
 					if ( portalColor[ i ] == 0 ) scene.children[ i ].material.color.setHex( 0xffffff ) ;
 					else if ( portalColor[ i ] > 0 ) {
