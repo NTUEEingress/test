@@ -330,22 +330,22 @@
 			}
 			function changeColor(){
 				for ( var i = 0 ; i < num ; i ++ ) {
-					var bothClose = true;
+					var nearPortal = [false, false];
 					for ( var j = 0 ; j < 2 ; j ++ ) {
 						if ( Math.hypot( helicopter[ j ].position.x - x[i] , helicopter[ j ].position.y - y[i] ) < 20) {
 							if ( j == 0 && portalColor[ i ] < 300 ) portalColor[ i ] ++ ;
 							else if ( j == 1 && portalColor[ i ] > -300 ) portalColor[ i ] -- ;
+							nearPortal[j] = true;
 						}
 						else {
 							if ( j == 0 && portalColor[ i ] > 0 && portalColor[ i ] != 300) portalColor[ i ] -- ;
 							else if ( j == 1 && portalColor[ i ] < 0 && portalColor[ i ] != -300) portalColor[ i ] ++ ;
-							bothClose = false;
 						}
 					}
-					if ( bothClose )	{
-						if ( controlled[i] == 1 && portalColor[ i ] != 300)	portalColor[ i ] ++ ;
-						else if ( controlled[i] == 0 && portalColor[ i ] != -300)	portalColor[ i ] -- ;
-					}
+					
+					if ( controlled[i] == 1 && portalColor[ i ] != 300 && !( !nearPortal[0] && nearPortal[1] ))	portalColor[ i ] ++ ;
+					else if ( controlled[i] == 0 && portalColor[ i ] != -300 && !( !nearPortal[1] && nearPortal[0] ))	portalColor[ i ] -- ;
+					
 					if ( portalColor[ i ] == 0 ){
 						scene.children[ i ].material.color.setHex( 0xffffff ) ;
 						controlled[i] = 100;
