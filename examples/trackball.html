@@ -63,6 +63,7 @@
 			var timeOrigin = [] ;
 			var controlled = [] ;
 			var portalColor = [] ;
+			var PortalEffect = [];//0: none,1: speed buff,
 			var CountStart = 0 , NUM = "6" , NUMP = "6" , PID = 5 , Source = 0 ;
 			var MAP = new Map() ; MAP.set( "6" , 1 ) ;
 			//for score
@@ -120,10 +121,10 @@
 					mesh_circle.position.y = y[i];
 					controlled[ i ] = false;
 					portalColor[ i ] = 0 ;
-
 					scene.add(mesh_circle);
 					nodeList.push(mesh_circle);
 				}
+<<<<<<< HEAD
 					
 				//outline
 				for(var i=0;i<num;i++){
@@ -136,6 +137,9 @@
 	
 				}
 
+=======
+				SetPortalEffect();
+>>>>>>> origin/master
 				raycaster = new THREE.Raycaster();
 
 				// helicopter
@@ -206,8 +210,9 @@
 					helicopter[i].position.y = y[0];
 					destination[i].x = x[0];
 					destination[i].y = y[0];
+					velocity[i] = 5;
 				}
-				SCORES = 0;
+				score = [0,0];
 				for(var i=0;i<num;i++){
 					portalColor[i] = 0;
 				}
@@ -287,6 +292,7 @@
 
 				var button = event.button ;
 				console.log("Click.");
+				console.log(velocity[0],velocity[1]);
 
 				mouse_click.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 				mouse_click.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
@@ -311,10 +317,11 @@
 				changeColor();
 				Count();
 				updatescore();
-				requestAnimationFrame( animate );
+				BuffDetector();
 				controls.update();
 				//render_move();
 				render_click();
+				requestAnimationFrame( animate );
 			}
 			function changeColor(){
 				for ( var i = 0 ; i < num ; i ++ ) {
@@ -330,7 +337,7 @@
 						//scene.children[ outlineOffset + i].geometry.thetaLength = Math.PI*2 ;
 					} else if ( portalColor[ i ] < 0 ) {
 						scene.children[ i ].material.color.setHex( 0xffffff - 0x010001 * Math.floor( -portalColor[ i ] / 300 * 255 ) ) ;
-						scene.children[ outlineOffset + i].geometry.thetaLength = Math.PI*2 ;
+						//scene.children[ outlineOffset + i].geometry.thetaLength = Math.PI*2 ;
 					}
 				}
 				/*
@@ -362,6 +369,24 @@
 					}
 				}
 				*/
+			}
+			//portalEffect manager
+			function SetPortalEffect(){
+				//Speed Buff
+				PortalEffect[0] = 1;
+				//
+			}
+			//Buff detector
+			function BuffDetector(){
+				for(var i=0;i<num;i++){
+					if((portalColor[i] == 300 )&& (PortalEffect[i] == 1)){
+						velocity[0] = 10;
+					}
+					if((portalColor[i] == -300) && (PortalEffect[i] ==1)){
+						velocity[1] = 10;
+					}
+				}
+				console.log(portalColor[0],PortalEffect[0],velocity[0],velocity[1]);
 			}
 			function render_move(){
 				//find intersection_move
@@ -395,25 +420,23 @@
 
 				renderer.render( scene , camera ) ;
 			}
-			function render() {
+			function render(){
 				renderer.render( scene, camera );
 				stats.update();
 			}
 			
-			function updatetower()
-			{
+			function updatetower(){
 
 				
 			}
 			
-			function updatescore()
-			{
+			function updatescore(){
 				/*for(var i=0;i!=2;i++)
 				{
 					score[i]+=tower[i]*100;
 					
 				}*/
-				for(var i=0;i<5;i++)
+				for(var i=0;i<num;i++)
 				{
 					if(portalColor[i]==300)
 						score[0]++;
