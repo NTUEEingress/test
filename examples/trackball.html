@@ -58,12 +58,13 @@
 			var mouse_click = new THREE.Vector2(),INTERSECTED_M,INTERSECTED_C;
 			var mouse_move = new THREE.Vector2();
 			var x = [], y = [];
-			var helicopter, velocity, destination, move_or_not = false;
-			var closeToPortal = false, portalId;
-			var timeOrigin;
-			var controlled = [];
-			var CountStart=0,NUM="6",NUMP="6",PID=5,Source=0;
-			var MAP = new Map();MAP.set("6",1);
+			var helicopter = [] , velocity = [] , destination = [] , move_or_not = [ false , false ] ;
+			var closeToPortal = [ false , false ] , portalId = [] ;
+			var timeOrigin = [] ;
+			var controlled = [] ;
+			var portalColor = [] ;
+			var CountStart = 0 , NUM = "6" , NUMP = "6" , PID = 5 , Source = 0 ;
+			var MAP = new Map() ; MAP.set( "6" , 1 ) ;
 			//for score
 			var SCORES=0;
 
@@ -112,7 +113,8 @@
 					} while ( true ) ;
 					mesh_circle.position.x = x[i];
 					mesh_circle.position.y = y[i];
-					controlled[i] = false;
+					controlled[ i ] = false;
+					portalColor[ i ] = 0 ;
 
 					scene.add(mesh_circle);
 					nodeList.push(mesh_circle);
@@ -121,17 +123,19 @@
 				raycaster = new THREE.Raycaster();
 
 				// helicopter
-				var geometry_helicopter = new THREE.SphereGeometry(35,20,20);
-				var material_helicopter = new THREE.MeshLambertMaterial({color: 0x00ff00 });
-				helicopter = new THREE.Mesh(geometry_helicopter, material_helicopter);
-				velocity = 5;
-				helicopter.position.x = x[0];
-				helicopter.position.y = y[0];
-				helicopter.position.z = 35;
+				for ( var i = 0 ; i < 2 ; i ++ ) {
+					var geometry_helicopter = new THREE.SphereGeometry( 35 , 20 , 20 ) ;
+					var material_helicopter = new THREE.MeshLambertMaterial( { color: 0x00ff00 + 0x0000ff * i } ) ;
+					helicopter[ i ] = new THREE.Mesh( geometry_helicopter , material_helicopter ) ;
+					velocity[ i ] = 5 ;
+					helicopter[ i ].position.x = x[ 0 ] ;
+					helicopter[ i ].position.y = y[ 0 ] ;
+					helicopter[ i ].position.z = 35 * ( i * 2 - 1 ) ;
+					scene.add( helicopter[ i ] ) ;
+				}
 
-				scene.add(helicopter);
-
-				destination = new THREE.Vector2(x[0], y[0]);
+				destination[ 0 ] = new THREE.Vector2(x[0], y[0]);
+				destination[ 1 ] = new THREE.Vector2(x[0], y[0]);
 
 				// Misc
 				//mouse
@@ -205,6 +209,9 @@
 					mesh.position.z = 100;
 					mesh.castShadow = true;
 					mesh.receiveShadow = true;
+					mesh.rotation.x = 90 ;
+					mesh.rotation.y = 0 ;
+					mesh.rotation.z = 0 ;
 					if(Source>0){scene.remove(scene.children[scene.children.length-1]);MAP.delete(NUMP);Source--;}
 					scene.add( mesh );
 					Source++;
@@ -244,21 +251,28 @@
 				mouse_move.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 			}
 			function onDocumentMouseDown( event ) {
-				event.preventDefault();
+				event.preventDefault() ;
 
+				var button = event.button ;
 				console.log("Click.");
 
 				mouse_click.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 				mouse_click.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 				//move helicopter
-				raycaster.setFromCamera(mouse_click,camera);
-				var intersect_click = raycaster.intersectObjects(nodeList)
+				raycaster.setFromCamera(mouse_click,camera) ;
+				var intersect_click = raycaster.intersectObjects(nodeList) ;
 
 				if ( intersect_click.length > 0 ) {
 					//helicopter move or not
-					destination.x = intersect_click[0].object.position.x;
-					destination.y = intersect_click[0].object.position.y;
-					move_or_not = true ;
+					if ( button == 0 ) {
+						destination[ 0 ].x = intersect_click[0].object.position.x;
+						destination[ 0 ].y = intersect_click[0].object.position.y;
+						move_or_not[ 0 ] = true ;
+					} else if ( button == 2 ) {
+						destination[ 1 ].x = intersect_click[0].object.position.x;
+						destination[ 1 ].y = intersect_click[0].object.position.y;
+						move_or_not[ 1 ] = true ;
+					}
 				}
 			}
 			function animate() {
@@ -271,31 +285,49 @@
 				render_click();
 			}
 			function changeColor(){
-				if ( !closeToPortal ) {
-					for ( var i = 0 ; i < num ; i ++ ) {
-						if ( !controlled[ i ] && Math.hypot( helicopter.position.x - x[i] , helicopter.position.y - y[i] ) < 20) {
-							closeToPortal = true , portalId = i ;
-							timeOrigin = Date.now() ;
-							CountStart = 1 ;
-							PID = i ;
-							break ;
+				for ( var i = 0 ; i < num ; i ++ ) {
+					for ( var j = 0 ; j < 2 ; j ++ ) {
+						if ( Math.hypot( helicopter[ j ].position.x - x[i] , helicopter[ j ].position.y - y[i] ) < 20) {
+							if ( j == 0 && portalColor[ i ] < 300 ) portalColor[ i ] ++ ;
+							else if ( j == 1 && portalColor[ i ] > -300 ) portalColor[ i ] -- ;
 						}
 					}
-				} else {
-					if ( Math.hypot( helicopter.position.x - x[ portalId ] , helicopter.position.y - y[ portalId ] ) >= 20 ) {
-						scene.children[ portalId ].material.color.setHex( 0xffffff ) ;
-						closeToPortal = false ;
+					if ( portalColor[ i ] == 0 ) scene.children[ i ].material.color.setHex( 0xffffff ) ;
+					else if ( portalColor[ i ] > 0 ) {
+						scene.children[ i ].material.color.setHex( 0xffffff - 0x000101 * Math.floor( portalColor[ i ] / 300 * 255 ) ) ;
+					} else if ( portalColor[ i ] < 0 ) {
+						scene.children[ i ].material.color.setHex( 0xffffff - 0x010001 * Math.floor( -portalColor[ i ] / 300 * 255 ) ) ;
+					}
+				}
+				/*
+				for ( var j = 0 ; j < 2 ; j ++ ) {
+					if ( !closeToPortal[ j ] ) {
+						for ( var i = 0 ; i < num ; i ++ ) {
+							if ( !controlled[ i ] && Math.hypot( helicopter[ j ].position.x - x[i] , helicopter[ j ].position.y - y[i] ) < 20) {
+								closeToPortal[ j ] = true , portalId[ j ] = i ;
+								timeOrigin[ j ] = Date.now() ;
+								CountStart = 1 ;
+								PID = i ;
+								break ;
+							}
+						}
 					} else {
-						var tmp = Date.now() - timeOrigin ;
-						if ( tmp >= 5000 ) {
-							closeToPortal = false ;
-							controlled[ portalId ] = true ;
+						if ( Math.hypot( helicopter[ j ].position.x - x[ portalId[ j ] ] , helicopter[ j ].position.y - y[ portalId[ j ] ] ) >= 20 ) {
+							scene.children[ portalId[ j ] ].material.color.setHex( 0xffffff ) ;
+							closeToPortal[ j ] = false ;
 						} else {
-							var color = 0xffffff - ( 255 * tmp / 5000 ) ;
-							scene.children[ portalId ].material.color.setHex( color ) ;
+							var tmp = Date.now() - timeOrigin[ j ] ;
+							if ( tmp >= 5000 ) {
+								closeToPortal[ j ] = false ;
+								controlled[ portalId[ j ] ] = true ;
+							} else {
+								var color = 0xffffff - ( 255 * tmp / 5000 ) ;
+								scene.children[ portalId[ j ] ].material.color.setHex( color ) ;
+							}
 						}
 					}
 				}
+				*/
 			}
 			function render_move(){
 				//find intersection_move
@@ -314,15 +346,17 @@
 			}
 			function render_click(){
 				//move helicopter
-				if( Math.pow(destination.x - helicopter.position.x , 2 ) + Math.pow( destination.y - helicopter.position.y , 2 )
-				   <= Math.pow( velocity , 2 ) ) {
-					move_or_not = false;
-				} else if ( move_or_not ) {
-					var distance = Math.hypot( destination.x - helicopter.position.x , destination.y - helicopter.position.y ) ;
-					helicopter.position.x += velocity * ( destination.x - helicopter.position.x ) / distance ;
-					helicopter.position.y += velocity * ( destination.y - helicopter.position.y ) / distance ;
-					//console.log( destination.x , destination.y ) ;
-					//console.log(helicopter.position.x,helicopter.position.y);
+				for ( var i = 0 ; i < 2 ; i ++ ) {
+					if( Math.hypot( destination[ i ].x - helicopter[ i ].position.x , destination[ i ].y - helicopter[ i ].position.y )
+					   <= velocity[ i ] ) {
+						move_or_not[ i ] = false;
+					} else if ( move_or_not[ i ] == true ) {
+						var distance = Math.hypot( destination[ i ].x - helicopter[ i ].position.x , destination[ i ].y - helicopter[ i ].position.y ) ;
+						helicopter[ i ].position.x += velocity[ i ] * ( destination[ i ].x - helicopter[ i ].position.x ) / distance ;
+						helicopter[ i ].position.y += velocity[ i ] * ( destination[ i ].y - helicopter[ i ].position.y ) / distance ;
+						//console.log( destination[ i ].x , destination[ i ].y ) ;
+						//console.log(helicopter.position.x,helicopter.position.y);
+					}
 				}
 
 				renderer.render( scene , camera ) ;
