@@ -38,7 +38,6 @@
 			<a href="http://threejs.org" target="_blank">three.js</a> - trackball controls example</br>
 			MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
 			</br>Score : <font id="score"></font>
-			<input type="button" value="Team Switch" onclick="SwitchTeam()"></input> Team : <font id="team"></font>
 		</div>			
 		<script src="../build/three.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -67,8 +66,6 @@
 			var MAP = new Map();MAP.set("6",1);
 			//for score
 			var SCORES=0;
-			//team
-			var TeamName = 1;
 
 			init();
 			animate();
@@ -185,20 +182,6 @@
 			function PrintScore(){
 				SCORES++;
 				document.getElementById("score").innerHTML = SCORES;
-			}
-			//Team Switch
-			function SwitchTeam(){
-				console.log(TeamName);
-				if(TeamName == 2)
-				{ 
-					TeamName = 1;
-				}
-				else{
-					TeamName = 2;
-					console.log(TeamName);
-				}
-				console.log(TeamName);
-				document.getElementById("team").innerHTML = TeamName;
 			}
 			//countdown
 			function CountDown(){
@@ -357,7 +340,6 @@
 					console.log(destination.x,destination.y);
 					//console.log(helicopter.position.x,helicopter.position.y);
 				}
-
 
 				renderer.render(scene,camera);
 			}
