@@ -338,8 +338,8 @@
 							nearPortal[j] = true;
 						}
 						else {
-							if ( j == 0 && portalColor[ i ] > 0 && portalColor[ i ] != 300) portalColor[ i ] -- ;
-							else if ( j == 1 && portalColor[ i ] < 0 && portalColor[ i ] != -300) portalColor[ i ] ++ ;
+							if ( j == 0 && portalColor[ i ] > 0 && portalColor[ i ] != 300 && controlled[i] != 1) portalColor[ i ] -- ;
+							else if ( j == 1 && portalColor[ i ] < 0 && portalColor[ i ] != -300 && controlled[i] != 0) portalColor[ i ] ++ ;
 						}
 					}
 					
