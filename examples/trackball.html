@@ -37,7 +37,7 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - trackball controls example</br>
 			MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
-			</br>Score : <font id="score"></font>
+			</br>Score : <font id="score"></font><button onclick="reinit()">Restart</button>
 		</div>			
 		<script src="../build/three.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -70,6 +70,7 @@
 			var tower=[0,0];
 			var score=[0,0];
 
+
 			init();
 			animate();
 
@@ -98,7 +99,7 @@
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xcccccc, 0 );
-
+				//Circles
 				var geometry_circle = new THREE.CircleGeometry(40,32);
 
 				for(var i=0;i<num;i++){
@@ -182,8 +183,24 @@
 
 				render();
 
+				console.log("initialized");
 			} //}}}
-
+			function reinit(){
+				
+				camera.position.set(0,-400,800);
+				for(var i=0;i<2;i++){
+					helicopter[i].position.x = x[0];
+					helicopter[i].position.y = y[0];
+					destination[i].x = x[0];
+					destination[i].y = y[0];
+				}
+				SCORES = 0;
+				for(var i=0;i<num;i++){
+					portalColor[i] = 0;
+				}
+				console.log("reinit called")
+			}	
+			
 			//use this funtion to print Score
 
 			function PrintScore(){
