@@ -67,6 +67,8 @@
 			var MAP = new Map() ; MAP.set( "6" , 1 ) ;
 			//for score
 			var SCORES=0;
+			var tower=[0,0];
+			var score=[0,0];
 
 			init();
 			animate();
@@ -278,7 +280,7 @@
 			function animate() {
 				changeColor();
 				Count();
-				PrintScore();
+				updatescore();
 				requestAnimationFrame( animate );
 				controls.update();
 				//render_move();
@@ -364,6 +366,29 @@
 			function render() {
 				renderer.render( scene, camera );
 				stats.update();
+			}
+			
+			function updatetower()
+			{
+
+				
+			}
+			
+			function updatescore()
+			{
+				/*for(var i=0;i!=2;i++)
+				{
+					score[i]+=tower[i]*100;
+					
+				}*/
+				for(var i=0;i<5;i++)
+				{
+					if(portalColor[i]==300)
+						score[0]++;
+					else if(portalColor[i]==-300)
+						score[1]++;
+				}
+				document.getElementById("score").innerHTML = score[0]+":"+score[1];
 			}
 
 		</script>
