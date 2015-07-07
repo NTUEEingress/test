@@ -75,7 +75,8 @@
 			var counter = [];
 			// outline
 			var outlineOffset = 5 ;
-
+			var circleSegment = new Array(5);
+			var pieces = 60;
 
 			init();
 			animate();
@@ -138,6 +139,7 @@
 					var outlineMesh1 = new THREE.Mesh( outline_geometry, outlineMaterial1 ) ;
 					outlineMesh1.position.x = x[ i ] ;
 					outlineMesh1.position.y = y[ i ] ;
+					outlineMesh1.material.visible = false;
 					scene.add( outlineMesh1 );
 
 				}
@@ -158,7 +160,19 @@
 					helicopter[ i ].position.z = 35 * ( i * 2 - 1 ) ;
 					scene.add( helicopter[ i ] ) ;
 				}
-
+				for ( var i = 0 ; i < num ; i ++ ) {
+					circleSegment[i] = new Array(pieces);
+					for ( var j = 0 ; j < pieces ; j ++) {
+						var outline_geometry = new THREE.RingGeometry( 40, 50, 20 , 0 , j * 2 * Math.PI / pieces , 2 * Math.PI / pieces ) ;
+						var outlineMaterial1 = new THREE.MeshBasicMaterial( { color: 0xffff00, side: THREE.DoubleSide } ) ;
+						circleSegment[i][j] = new THREE.Mesh( outline_geometry, outlineMaterial1 ) ;
+						circleSegment[i][j].position.x = x[ i ] ;
+						circleSegment[i][j].position.y = y[ i ] ;
+						circleSegment[i][j].material.visible = false;
+						
+						scene.add( circleSegment[i][j] );
+					}
+				}
 				destination[ 0 ] = new THREE.Vector2(x[0], y[0]);
 				destination[ 1 ] = new THREE.Vector2(x[0], y[0]);
 				
@@ -366,51 +380,40 @@
 					}
 					else if ( portalColor[ i ] > 0 ) {
 						scene.children[ i ].material.color.setHex( 0xffffff - 0x000101 * Math.floor( portalColor[ i ] / 300 * 255 ) ) ;
-						delete scene.children[ outlineOffset + i].geometry;
-						scene.children[ outlineOffset + i].geometry = new THREE.RingGeometry( 40, 50, 20 , 0 , 0 , portalColor[ i ] / 300 * Math.PI * 2 ) ;
+						//delete scene.children[ outlineOffset + i].geometry;
+						//scene.children[ outlineOffset + i].geometry = new THREE.RingGeometry( 40, 50, 20 , 0 , 0 , portalColor[ i ] / 300 * Math.PI * 2 ) ;
+						
 						if ( portalColor[ i ] == 300 )	controlled[i] = 1;
+					
 					} else if ( portalColor[ i ] < 0 ) {
 						scene.children[ i ].material.color.setHex( 0xffffff - 0x010001 * Math.floor( -portalColor[ i ] / 300 * 255 ) ) ;
-						delete scene.children[ outlineOffset + i].geometry;
-						scene.children[ outlineOffset + i].geometry = new THREE.RingGeometry( 40, 50, 20 , 0 , 0 , portalColor[ i ] / 300 * Math.PI * 2 ) ;
-						if ( portalColor[ i ] == 300 )	controlled[i] = 1;
-					} else if ( portalColor[ i ] < 0 ) {
-						scene.children[ i ].material.color.setHex( 0xffffff - 0x010001 * Math.floor( -portalColor[ i ] / 300 * 255 ) ) ;
-						scene.children[ outlineOffset + i].material.color.setHex(0x990099);
-						scene.children[ outlineOffset + i].geometry = new THREE.RingGeometry( 40, 50, 32 , 8 , 0 , portalColor[ i ] / 300 * Math.PI * 2 ) ;
-
+						//delete scene.children[ outlineOffset + i].geometry;
+						//scene.children[ outlineOffset + i].geometry = new THREE.RingGeometry( 40, 50, 20 , 0 , 0 , portalColor[ i ] / 300 * Math.PI * 2 ) ;
+						
 						if ( portalColor[ i ] == -300 )	controlled[i] = 0;
 					}
+					setCircle( i, Math.floor( portalColor[ i ] / 300 * pieces ) );
 				}
-				/*
-				for ( var j = 0 ; j < 2 ; j ++ ) {
-					if ( !closeToPortal[ j ] ) {
-						for ( var i = 0 ; i < num ; i ++ ) {
-							if ( !controlled[ i ] && Math.hypot( helicopter[ j ].position.x - x[i] , helicopter[ j ].position.y - y[i] ) < 20) {
-								closeToPortal[ j ] = true , portalId[ j ] = i ;
-								timeOrigin[ j ] = Date.now() ;
-								CountStart = 1 ;
-								PID = i ;
-								break ;
+			}
+			function setCircle( i, numOfSegment ){
+				for( var j = numOfSegment - 1 ; j <= numOfSegment + 1 ; j++ ){
+					if( Math.abs(j) < pieces ){
+						// to be edited
+						/*
+						if( j <= Math.abs(numOfSegment)){
+							if( j > 0 ){
+								circleSegment[i][j].material.visible = true;
+								circleSegment[i][j].material.color.setHex(0xff00ff);
 							}
+							else if( j <= 0 ){
+								circleSegment[i][-j].material.visible = true;
+								circleSegment[i][-j].material.color.setHex(0xffff00);
+							} 
 						}
-					} else {
-						if ( Math.hypot( helicopter[ j ].position.x - x[ portalId[ j ] ] , helicopter[ j ].position.y - y[ portalId[ j ] ] ) >= 20 ) {
-							scene.children[ portalId[ j ] ].material.color.setHex( 0xffffff ) ;
-							closeToPortal[ j ] = false ;
-						} else {
-							var tmp = Date.now() - timeOrigin[ j ] ;
-							if ( tmp >= 5000 ) {
-								closeToPortal[ j ] = false ;
-								controlled[ portalId[ j ] ] = true ;
-							} else {
-								var color = 0xffffff - ( 255 * tmp / 5000 ) ;
-								scene.children[ portalId[ j ] ].material.color.setHex( color ) ;
-							}
-						}
+						else circleSegment[i][Math.abs(j)].material.visible = false;
+						*/
 					}
 				}
-				*/
 			}
 			//portalEffect manager
 			function SetPortalEffect(){
