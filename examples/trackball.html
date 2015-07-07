@@ -136,6 +136,7 @@
 					outlineMesh1.position.x = x[ i ] ;
 					outlineMesh1.position.y = y[ i ] ;
 					scene.add( outlineMesh1 );
+
 				}
 
 				SetPortalEffect();
@@ -203,6 +204,7 @@
 
 				console.log("initialized");
 				//console.log( scene.children[ outlineOffset ] ) ;
+
 			} //}}}
 			function reinit(){
 				
@@ -222,7 +224,7 @@
 				for ( var i = 0 ; i < num ; i ++ ) {
 						scene.children[ outlineOffset + i].geometry = new THREE.RingGeometry( 40, 50, 32 , 8 , 0 , portalColor[ i ] / 300 * Math.PI * 2 ) ;
 				}
-				console.log("reinit called")
+
 			}	
 			
 			/* {{{
@@ -362,6 +364,12 @@
 						scene.children[ i ].material.color.setHex( 0xffffff - 0x010001 * Math.floor( -portalColor[ i ] / 300 * 255 ) ) ;
 						delete scene.children[ outlineOffset + i].geometry;
 						scene.children[ outlineOffset + i].geometry = new THREE.RingGeometry( 40, 50, 20 , 0 , 0 , portalColor[ i ] / 300 * Math.PI * 2 ) ;
+						if ( portalColor[ i ] == 300 )	controlled[i] = 1;
+					} else if ( portalColor[ i ] < 0 ) {
+						scene.children[ i ].material.color.setHex( 0xffffff - 0x010001 * Math.floor( -portalColor[ i ] / 300 * 255 ) ) ;
+						scene.children[ outlineOffset + i].material.color.setHex(0x990099);
+						scene.children[ outlineOffset + i].geometry = new THREE.RingGeometry( 40, 50, 32 , 8 , 0 , portalColor[ i ] / 300 * Math.PI * 2 ) ;
+
 						if ( portalColor[ i ] == -300 )	controlled[i] = 0;
 					}
 				}
@@ -404,10 +412,10 @@
 			//Buff detector
 			function BuffDetector(){
 				for(var i=0;i<num;i++){
-					if((portalColor[i] == 300 )&& (PortalEffect[i] == 1)){
+					if((controlled[i] == 300 )&& (PortalEffect[i] == 1)){
 						velocity[0] = 10;
 					}
-					if((portalColor[i] == -300) && (PortalEffect[i] ==1)){
+					if((controlled[i] == -300) && (PortalEffect[i] ==1)){
 						velocity[1] = 10;
 					}
 				}
