@@ -70,6 +70,9 @@
 			var SCORES=0;
 			var tower=[0,0];
 			var score=[0,0];
+			//for buffs
+			var activated = [];
+			var counter = [];
 			// outline
 			var outlineOffset = 5 ;
 
@@ -158,6 +161,12 @@
 
 				destination[ 0 ] = new THREE.Vector2(x[0], y[0]);
 				destination[ 1 ] = new THREE.Vector2(x[0], y[0]);
+				
+				//Buffs
+				for(var i=0;i<num;i++){
+					activated[i] = false;
+					counter[i] = 0;
+				}
 
 				// Misc
 				//mouse
@@ -412,14 +421,22 @@
 			//Buff detector
 			function BuffDetector(){
 				for(var i=0;i<num;i++){
-					if((controlled[i] == 300 )&& (PortalEffect[i] == 1)){
-						velocity[0] = 10;
-					}
-					if((controlled[i] == -300) && (PortalEffect[i] ==1)){
-						velocity[1] = 10;
+					//speed buff
+					if( !activated[i] ){
+						for(var j=0;j<2;j++){
+							if((controlled[i] == j ) && (PortalEffect[i] == 1)){
+								if(counter[0] < 300 ){
+									velocity[j] = 10;
+									counter[0] ++;
+								}else{
+									velocity[j] = 5;
+									activated[i] = true;
+									counter[0] = 0;
+								}
+							}
+						}
 					}
 				}
-				// console.log(portalColor[0],PortalEffect[0],velocity[0],velocity[1]);
 			}
 			/*
 			function render_move(){
