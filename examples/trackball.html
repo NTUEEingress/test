@@ -112,8 +112,10 @@
 						y[i] = Math.random() * 480 - 240;
 						var flag = 0 ;
 						for ( var j = 0 ; j < i ; j ++ ) {
-							if ( ( Math.pow( x[ i ] - x[ j ] , 2 ) + Math.pow( y[ i ] - y[ j ] , 2 ) ) < Math.pow( 200 , 2 ) )
+							if ( ( Math.pow( x[ i ] - x[ j ] , 2 ) + Math.pow( y[ i ] - y[ j ] , 2 ) ) < Math.pow( 200 , 2 ) ){
 								flag = 1 ;
+								break;
+							}								
 						}
 						if ( flag == 0 ) { break ; }
 					} while ( true ) ;
@@ -200,6 +202,7 @@
 				render();
 
 				console.log("initialized");
+				//console.log( scene.children[ outlineOffset ] ) ;
 			} //}}}
 			function reinit(){
 				
@@ -352,11 +355,13 @@
 					}
 					else if ( portalColor[ i ] > 0 ) {
 						scene.children[ i ].material.color.setHex( 0xffffff - 0x000101 * Math.floor( portalColor[ i ] / 300 * 255 ) ) ;
-						scene.children[ outlineOffset + i].geometry = new THREE.RingGeometry( 40, 50, 32 , 8 , 0 , portalColor[ i ] / 300 * Math.PI * 2 ) ;
+						delete scene.children[ outlineOffset + i].geometry;
+						scene.children[ outlineOffset + i].geometry = new THREE.RingGeometry( 40, 50, 20 , 0 , 0 , portalColor[ i ] / 300 * Math.PI * 2 ) ;
 						if ( portalColor[ i ] == 300 )	controlled[i] = 1;
 					} else if ( portalColor[ i ] < 0 ) {
 						scene.children[ i ].material.color.setHex( 0xffffff - 0x010001 * Math.floor( -portalColor[ i ] / 300 * 255 ) ) ;
-						scene.children[ outlineOffset + i].geometry = new THREE.RingGeometry( 40, 50, 32 , 8 , 0 , portalColor[ i ] / 300 * Math.PI * 2 ) ;
+						delete scene.children[ outlineOffset + i].geometry;
+						scene.children[ outlineOffset + i].geometry = new THREE.RingGeometry( 40, 50, 20 , 0 , 0 , portalColor[ i ] / 300 * Math.PI * 2 ) ;
 						if ( portalColor[ i ] == -300 )	controlled[i] = 0;
 					}
 				}
@@ -408,6 +413,7 @@
 				}
 				// console.log(portalColor[0],PortalEffect[0],velocity[0],velocity[1]);
 			}
+			/*
 			function render_move(){
 				//find intersection_move
 				raycaster.setFromCamera(mouse_move,camera);
@@ -423,6 +429,7 @@
 
 				renderer.render(scene,camera);
 			}
+			*/
 			function render_click(){
 				//move helicopter
 				for ( var i = 0 ; i < 2 ; i ++ ) {
