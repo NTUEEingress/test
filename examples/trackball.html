@@ -160,6 +160,9 @@
 					helicopter[ i ].position.z = 35 * ( i * 2 - 1 ) ;
 					scene.add( helicopter[ i ] ) ;
 				}
+				destination[ 0 ] = new THREE.Vector2(x[0], y[0]);
+				destination[ 1 ] = new THREE.Vector2(x[0], y[0]);
+				//Timer(outline) init
 				for ( var i = 0 ; i < num ; i ++ ) {
 					circleSegment[i] = new Array(pieces);
 					for ( var j = 0 ; j < pieces ; j ++) {
@@ -173,8 +176,6 @@
 						scene.add( circleSegment[i][j] );
 					}
 				}
-				destination[ 0 ] = new THREE.Vector2(x[0], y[0]);
-				destination[ 1 ] = new THREE.Vector2(x[0], y[0]);
 				
 				//Buffs
 				for(var i=0;i<num;i++){
@@ -396,22 +397,20 @@
 				}
 			}
 			function setCircle( i, numOfSegment ){
-				for( var j = numOfSegment - 1 ; j <= numOfSegment + 1 ; j++ ){
-					if( Math.abs(j) < pieces ){
-						// to be edited
-						/*
-						if( j <= Math.abs(numOfSegment)){
-							if( j > 0 ){
-								circleSegment[i][j].material.visible = true;
-								circleSegment[i][j].material.color.setHex(0xff00ff);
-							}
-							else if( j <= 0 ){
-								circleSegment[i][-j].material.visible = true;
-								circleSegment[i][-j].material.color.setHex(0xffff00);
-							} 
-						}
-						else circleSegment[i][Math.abs(j)].material.visible = false;
-						*/
+				for(var j = 0;j < Math.abs(numOfSegment); j++){
+					if( numOfSegment > 0 ){
+						circleSegment[i][j].material.visible = true;
+						circleSegment[i][j].material.color.setHex(0xff00ff);
+					}else if( numOfSegment < 0 ){
+						circleSegment[i][pieces - j-1].material.visible = true;
+						circleSegment[i][pieces - j-1].material.color.setHex(0xffff00);
+					}
+				}
+				for(var j = Math.abs(numOfSegment);j < pieces;j++){
+					if( numOfSegment > 0 ){
+						circleSegment[i][j].material.visible = false;			
+					}else if( numOfSegment <= 0 ){
+						circleSegment[i][pieces - j-1].material.visible = false;						
 					}
 				}
 			}
