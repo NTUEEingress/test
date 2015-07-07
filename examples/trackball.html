@@ -227,7 +227,6 @@
 				render();
 
 				console.log("initialized");
-				//console.log( scene.children[ outlineOffset ] ) ;
 
 			} //}}}
 			function reinit(){
@@ -251,60 +250,6 @@
 
 			}	
 			
-			/* {{{
-			//use this funtion to print Score
-
-			function PrintScore(){
-				SCORES++;
-				document.getElementById("score").innerHTML = SCORES;
-			}
-			function CountDown(){ //{{{
-				if(!MAP.has(NUM)){
-					var textGeo = new THREE.TextGeometry( NUM , {
-						size: 50,
-						height: 12.5,
-						curveSegments: 20,
-						font: "helvetiker",
-						weight: "bold",
-						style: "normal",
-						bevelThickness: 1.5,
-						bevelSize: 1,
-						bevelEnabled: true
-					});
-					textGeo.computeBoundingBox();
-					var textMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000  , specular: 0xffffff } );
-					var mesh = new THREE.Mesh( textGeo, textMaterial );
-					mesh.position.x = scene.children[PID].position.x-25;
-					mesh.position.y = scene.children[PID].position.y-25;
-					mesh.position.z = 100;
-					mesh.castShadow = true;
-					mesh.receiveShadow = true;
-					mesh.rotation.x = 90 ;
-					mesh.rotation.y = 0 ;
-					mesh.rotation.z = 0 ;
-					if(Source>0){scene.remove(scene.children[scene.children.length-1]);MAP.delete(NUMP);Source--;}
-					scene.add( mesh );
-					Source++;
-					MAP.set(NUM,1);
-					NUMP=NUM;
-				}
-			} //}}}
-
-			function Count(){
-				if(CountStart==1){
-					var tmp = Date.now() - timeOrigin ;
-					if(tmp < 5000) NUM = ( 5 - Math.floor( tmp / 1000 ) ).toString() ;
-					else {
-						NUM="6";
-						CountStart=0;
-						scene.remove(scene.children[scene.children.length-1]);
-						MAP.delete(NUMP);
-						Source--;NUMP="6";
-					}
-					CountDown();
-				}
-			}
-			}}} */
 			function onWindowResize() {
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -349,11 +294,10 @@
 			}
 			function animate() {
 				changeColor();
-				//Count();
 				updatescore();
 				BuffDetector();
+				console.log(controlled[0]);	
 				controls.update();
-				//render_move();
 				render_click();
 				requestAnimationFrame( animate );
 			}
@@ -438,25 +382,10 @@
 							}
 						}
 					}
+					if( controlled[i] == 100 ) activated[i] = false;
 				}
 			}
-			/*
-			function render_move(){
-				//find intersection_move
-				raycaster.setFromCamera(mouse_move,camera);
-				var intersect_move = raycaster.intersectObjects(scene.children)
 
-				if ( intersect_move.length > 0 ) {
-					if ( INTERSECTED_M ) INTERSECTED_M.material.color.setHex( INTERSECTED_M.currentHex );
-					console.log("10231654520");
-					INTERSECTED_M = intersect_move[ 0 ].object;
-					INTERSECTED_M.currentHex = INTERSECTED_M.material.color.getHex();
-					INTERSECTED_M.material.color.setHex( 0x00ff00 );
-				}
-
-				renderer.render(scene,camera);
-			}
-			*/
 			function render_click(){
 				//move helicopter
 				for ( var i = 0 ; i < 2 ; i ++ ) {
@@ -467,8 +396,7 @@
 						var distance = Math.hypot( destination[ i ].x - helicopter[ i ].position.x , destination[ i ].y - helicopter[ i ].position.y ) ;
 						helicopter[ i ].position.x += velocity[ i ] * ( destination[ i ].x - helicopter[ i ].position.x ) / distance ;
 						helicopter[ i ].position.y += velocity[ i ] * ( destination[ i ].y - helicopter[ i ].position.y ) / distance ;
-						//console.log( destination[ i ].x , destination[ i ].y ) ;
-						//console.log(helicopter.position.x,helicopter.position.y);
+
 					}
 				}
 
