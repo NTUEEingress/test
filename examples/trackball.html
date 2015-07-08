@@ -385,6 +385,23 @@
 					if( controlled[i] == 100 ) activated[i] = false;
 				}
 			}
+			function buildcastletower( x, y ){
+				loader = new THREE.JSONLoader();
+				loader.load( 'castle-tower.json', function( geometry, materials ) {
+				
+					castletower = new THREE.Mesh(
+						geometry,
+						new THREE.MeshFaceMaterial( materials )
+					);
+					castletower.position.x = x;
+					castletower.position.y = y - 25;
+					castletower.position.z = 0;
+					castletower.scale.x = 0.5;
+                    castletower.scale.y = 0.5;
+                    castletower.scale.z = 0.5;
+					scene.add( castletower );
+				} );
+			}
 
 			function render_click(){
 				//move helicopter
