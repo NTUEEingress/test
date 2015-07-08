@@ -45,7 +45,7 @@
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="fonts/helvetiker_bold.typeface.js"></script>
-
+		<script src="js/ColladaLoader.js"></script>
 		<script>
 
 			if ( !Detector.webgl ) Detector.addGetWebGLMessage();
@@ -224,6 +224,35 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
+				//import  3dmodel(.dae)
+				var oLoader = new THREE.ColladaLoader();
+				oLoader.load('model.dae', function(collada) {
+
+				var object = collada.scene;
+				var skin = collada.skins[0];
+
+				object.rotation.x = 0;
+				object.rotation.z = Math.PI / 2;
+				object.position.x = -50;
+				object.position.y = -100;
+				object.position.z = 10;
+				object.scale.set(5,5,5);
+				object.updateMatrix();
+				scene.add(object);
+  
+				object.traverse( function(child) {
+				if (child instanceof THREE.Mesh) {
+						console.log("child");
+      // apply custom material
+      // enable casting shadows
+      child.castShadow = true;
+      child.receiveShadow = true;
+    }
+  });
+  
+});
+				
+				
 				render();
 
 				console.log("initialized");
@@ -296,7 +325,7 @@
 				changeColor();
 				updatescore();
 				BuffDetector();
-				console.log(controlled[0],velocity[0],velocity[1]);	
+				console.log(controlled[0]);	
 				controls.update();
 				render_click();
 				requestAnimationFrame( animate );
@@ -384,23 +413,6 @@
 					}
 					if( controlled[i] == 100 ) activated[i] = false;
 				}
-			}
-			function buildcastletower( x, y ){
-				loader = new THREE.JSONLoader();
-				loader.load( 'castle-tower.json', function( geometry, materials ) {
-				
-					castletower = new THREE.Mesh(
-						geometry,
-						new THREE.MeshFaceMaterial( materials )
-					);
-					castletower.position.x = x;
-					castletower.position.y = y - 25;
-					castletower.position.z = 0;
-					castletower.scale.x = 0.5;
-                    castletower.scale.y = 0.5;
-                    castletower.scale.z = 0.5;
-					scene.add( castletower );
-				} );
 			}
 
 			function render_click(){
