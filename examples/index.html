@@ -30,23 +30,46 @@
 				color: red;
 			}
 		</style>
+		<script>
+			var connection ;
+			connection = new WebSocket("ws://"+window.location.hostname+":8081") ;
+			connection.onopen = function () {
+				console.log("Connection opened") ;
+				window.addEventListener( 'mouseclick' , function ( event ) {
+					var msg = ( event.detail ).toString() ;
+					console.log( msg ) ;
+					connection.send( msg ) ;
+				});
+				connection.onclose = function () {
+					console.log("Connection closed");
+				}
+				connection.onerror = function () {
+					console.error("Connection error");
+				}
+				connection.onmessage = function (event) {
+					var tmp = parseInt( event.data ) ;
+					receiveMouseEvent( Math.floor( tmp / 10 ) , tmp % 10 ) ;
+				}
+			}
+		</script>
 	</head>
+	
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			MOVE mouse &amp; click
+			MOVE mouse &amp; click to occupy
 			</br>Score : <font id="score"></font><button onclick="reinit()">Restart</button>
 
 			</br>Gametime : <font id="gametime"></font>
 		</div>
 
-		<script src="../build/three.min.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/renderers/Projector.js"></script>
-		<script src="js/Detector.js"></script>
-		<script src="fonts/helvetiker_bold.typeface.js"></script>
-
+		<script src="http://localhost:3000/build/three.min.js"></script>
+		<script src="http://localhost:3000/examples/js/libs/stats.min.js"></script>
+		<script src="http://localhost:3000/examples/js/controls/TrackballControls.js"></script>
+		<script src="http://localhost:3000/examples/js/renderers/Projector.js"></script>
+		<script src="http://localhost:3000/examples/js/Detector.js"></script>
+		<script src="http://localhost:3000/examples/fonts/helvetiker_bold.typeface.js"></script>
+		
 		<script>
 
 			if ( !Detector.webgl ) Detector.addGetWebGLMessage();
@@ -73,6 +96,8 @@
 				var inner_radius = radius;
 				var outer_radius = 50;
 				var outline_color = 0xffff00;
+			//uid
+			var uid ;
 			/*
 			//buffs setting
 			var activated = [];
@@ -91,7 +116,6 @@
 			var timeOrigin = [] ;
 			var controlled = [] ;
 			var controlSpeedUp = [];
-			var ableToControl = [];
 			
 			var gameStartTime;
 			//buff variables
@@ -126,6 +150,7 @@
 			animate();
 
 			function init() { //{{{
+				uid = parseInt( prompt( 'enter your uid' ) ) ;
 				// camera
 				console.log(Math.floor(Math.random()*3));
 				
@@ -162,7 +187,7 @@
 
 				
 				
-
+				//put circles into the screen
 				for ( var i = 0 ; i < num ; i ++ ) {
 					var mesh_circle = new THREE.Mesh(geometry_circle,new THREE.MeshBasicMaterial( { color: ball_basic_clolor} ));
 					do {
@@ -258,7 +283,6 @@
 				for(var i = -size;i<=size;i+=step){
 					geometry_plane.vertices.push( new THREE.Vector3( -size,i,-1 ) );
 					geometry_plane.vertices.push( new THREE.Vector3( size,i,-1) );
-
 					geometry_plane.vertices.push( new THREE.Vector3(i,-size,-1));
 					geometry_plane.vertices.push( new THREE.Vector3(i,size,-1) );
 				}
@@ -325,7 +349,7 @@
 				mouse_move.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 				mouse_move.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 			}
-			function onDocumentMouseDown( event ) {
+			/*function onDocumentMouseDown( event ) {
 				event.preventDefault() ;
 
 				var button = event.button ;
@@ -350,14 +374,47 @@
 						move_or_not[ 1 ] = true ;
 					}
 				}
+			}*/
+			function onDocumentMouseDown( event ) {
+				event.preventDefault() ;
+
+				var button = event.button ;
+				console.log("Click.");
+				// console.log(velocity[0],velocity[1]);
+
+				mouse_click.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse_click.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+				//move helicopter
+				raycaster.setFromCamera(mouse_click,camera) ;
+				var intersect_click = raycaster.intersectObjects(nodeList) ;
+
+				if ( intersect_click.length > 0 ) {
+					for ( var i = 0 ; i < num ; i ++ ) {
+						if ( x[ i ] == intersect_click[ 0 ].object.position.x && y[ i ] == intersect_click[ 0 ].object.position.y ) {
+							var mouseclick = new CustomEvent( 'mouseclick' , { 'detail' : uid * 10 + i } ) ;
+							console.log( mouseclick ) ;
+							window.dispatchEvent( mouseclick ) ;
+							break ;
+						}
+					}
+				}
 			}
+			
+			function receiveMouseEvent( uid , portalid ) {
+				//helicopter move or not
+				console.log( portalid ) ;
+				destination[ uid ].x = scene.children[ portalid ].position.x;
+				destination[ uid ].y = scene.children[ portalid ].position.y;
+				move_or_not[ uid ] = true ;
+			}
+			
 			function animate() {
 				
 				changeColor();
 				updatescore();
-				BuffDetector(Date.now());
-				BuffResetDetector(Date.now());
-				AutoGetBuff();
+				BuffDetector();
+				console.log(controlled[0]);	
+				BuffResetDetector();
 				controls.update();
 				render_click();
 				requestAnimationFrame( animate );
@@ -366,12 +423,12 @@
 				for ( var i = 0 ; i < num ; i ++ ) {
 					var nearPortal = [false, false];
 					for ( var j = 0 ; j < 2 ; j ++ ) {
-						if ( Math.hypot( helicopter[ j ].position.x - x[i] , helicopter[ j ].position.y - y[i] ) < 50) {
-							if ( j == 0 && portalColor[ i ] < 300 && ableToControl[j]){
+						if ( Math.hypot( helicopter[ j ].position.x - x[i] , helicopter[ j ].position.y - y[i] ) < 20) {
+							if ( j == 0 && portalColor[ i ] < 300 ){
 								portalColor[ i ] ++ ;
 								if(controlSpeedUp[j]) portalColor[ i ] ++ ;
 							}
-							else if ( j == 1 && portalColor[ i ] > -300 && ableToControl[j]){
+							else if ( j == 1 && portalColor[ i ] > -300 ){
 								portalColor[ i ] -- ;
 								if(controlSpeedUp[j]) portalColor[ i ] -- ;
 							} 
@@ -437,8 +494,7 @@
 			}
 			//portalEffect manager
 			function SetRandomPortal(i){
-				//PortalEffect[i] = Math.floor(8 * Math.random());
-				PortalEffect[i] = 0;
+				PortalEffect[i] = Math.floor(8 * Math.random());
 				buffResetTime[i] = 120000;
 				if(PortalEffect[i] == 0){
 					buffDuration[i] = 60000;
@@ -468,21 +524,13 @@
 			}
 			function SetPortalEffect(){
 				//Speed Buff
-				/*
 				PortalEffect[0] = 0;
 				PortalEffect[1] = 1;
 				PortalEffect[2] = 2;
 				PortalEffect[3] = 3;
 				PortalEffect[4] = -1; //effect 0~3, reset all portals, remove all buffs, cannot control, enemy cannot control
-				*/
-				PortalEffect[0] = -1;
-				PortalEffect[1] = -1;
-				PortalEffect[2] = -1;
-				PortalEffect[3] = -1;
-				PortalEffect[4] = -1;
 				
 				controlSpeedUp = [false, false];
-				ableToControl = [true, true];
 				for(var i = 0; i < num; i++){
 					isRandom[i] = false;
 					if(PortalEffect[i] == -1){
@@ -552,44 +600,21 @@
 						buffStartTime[i] = Date.now();
 						buffExist[i] = false;
 					}
-					else if(PortalEffect[i] == 5){
-						BuffDetector(Date.now() + 200000);
-						BuffResetDetector(Date.now() + 200000);
-						buffStartTime[i] = Date.now();
-						buffExist[i] = false;
-					}
-					else if(PortalEffect[i] == 6){
-						BuffDetector(Date.now() + 200000);
-						BuffResetDetector(Date.now() + 200000);
-						buffStartTime[i] = Date.now();
-						buffExist[i] = false;
-					}
-					else if(PortalEffect[i] == 7){
-						ableToControl[j] = false;
-						buffStartTime[i] = Date.now();
-						buffExist[i] = false;
-					}
-					else if(PortalEffect[i] == 7){
-						if(j == 0)	ableToControl[1] = false;
-						else		ableToControl[0] = false;
-						buffStartTime[i] = Date.now();
-						buffExist[i] = false;
-					}
 				}
 			}
 			//Buffs halt
-			function BuffDetector(dateNow){
+			function BuffDetector(){
 				for(var i=0;i<num;i++){
 					if(buffActivated[i] != -1){
-						if(PortalEffect[i] == 0 && (dateNow - buffStartTime[i] > buffDuration[i])){
+						if(PortalEffect[i] == 0 && (Date.now() - buffStartTime[i] > buffDuration[i])){
 							velocity[buffActivated[i]] /= 2;
 							buffActivated[i] = -1;
 						}
-						if(PortalEffect[i] == 1 && (dateNow - buffStartTime[i] > buffDuration[i])){
+						if(PortalEffect[i] == 1 && (Date.now() - buffStartTime[i] > buffDuration[i])){
 							scoreRatio[buffActivated[i]] /= 2;
 							buffActivated[i] = -1;
 						}
-						if(PortalEffect[i] == 3 && (dateNow - buffStartTime[i] > buffDuration[i])){
+						if(PortalEffect[i] == 3 && (Date.now() - buffStartTime[i] > buffDuration[i])){
 							controlSpeedUp[buffActivated[i]] = false;
 							buffActivated[i] = -1;
 						}
@@ -597,23 +622,13 @@
 					
 				}
 			}
-			function BuffResetDetector(dateNow){
+			function BuffResetDetector(){
 				for(var i=0;i<num;i++){
-					if(!buffExist[i] && (dateNow - buffStartTime[i] > buffResetTime[i])){
-						buffExist[i] = true;
-						if(isRandom[i])	SetRandomPortal(i);
-					}	
-					
+					if(!buffExist[i] && (Date.now() - buffStartTime[i] > buffResetTime[i]))	buffExist[i] = true;
+					if(controlled[i] == 1)	getBuff(i, 1);
+					else if(controlled[i] == 0)	getBuff(i, 0);
 				}
 			}
-			function AutoGetBuff(){
-				for(var i=0;i<num;i++){
-					if(buffExist[i]){
-						if(controlled[i] == 1)	getBuff(i, 1);
-						else if(controlled[i] == 0)	getBuff(i, 0);
-					}
-				}
-			}			
 			function buildcastletower( x, y ){
 				loader = new THREE.JSONLoader();
 				loader.load( 'castle-tower.json', function( geometry, materials ) {
