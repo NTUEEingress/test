@@ -43,6 +43,7 @@
 		<script src="../build/three.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/loaders/ColladaLoader.js"></script>
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="fonts/helvetiker_bold.typeface.js"></script>
@@ -203,18 +204,33 @@
 
 				// helicopter
 				for ( var i = 0 ; i < 2 ; i ++ ) {
-					var geometry_helicopter = new THREE.SphereGeometry( helicopter_radius , hori_sections , vert_sections ) ;
+					/*var geometry_helicopter = new THREE.SphereGeometry( helicopter_radius , hori_sections , vert_sections ) ;
 					var material_helicopter ;
 					if ( i == 1 ) material_helicopter = new THREE.MeshLambertMaterial( { color: helicopter_color[1] } ) ;
 					else material_helicopter = new THREE.MeshLambertMaterial( { color: helicopter_color[0] } ) ;
-					helicopter[ i ] = new THREE.Mesh( geometry_helicopter , material_helicopter ) ;
+					var sss = new THREE.Mesh( geometry_helicopter , material_helicopter ) ;*/
 					velocity[ i ] = 5 ;
 					
+					helicopter[i] = new THREE.Object3D();
+					//helicopter[i].add(sss);
 					helicopter[ i ].position.x = x[ 0 ] ;
 					helicopter[ i ].position.y = y[ 0 ] ;
 					helicopter[ i ].position.z = 35 * ( i * 2 - 1 ) ;
+					
 					scene.add( helicopter[ i ] ) ;
 				}
+				var loader = new THREE.ColladaLoader();
+				loader.load('ar-drone-2.dae', function(result) {
+					result.scene.scale.divideScalar(2);
+					console.log("=DDD");
+					helicopter.forEach(function(h) {
+					    var s = result.scene.clone();
+						h.add(s);
+						console.log("=))))");
+					});
+					render();
+				});
+				
 				destination[ 0 ] = new THREE.Vector2(x[0], y[0]);
 				destination[ 1 ] = new THREE.Vector2(x[0], y[0]);
 				//Timer(outline) init
