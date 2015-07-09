@@ -38,6 +38,7 @@
 			<a href="http://threejs.org" target="_blank">three.js</a> - trackball controls example</br>
 			MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
 			</br>Score : <font id="score"></font><button onclick="reinit()">Restart</button>
+			</br>Gametime : <font id="score"></font>
 		</div>			
 		<script src="../build/three.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -52,7 +53,7 @@
 
 			var container, stats;
 
-			var camera, controls, scene, renderer, raycaster,raycaster_move_heli;
+			var camera, controls, scene, renderer, raycaster, raycaster_move_heli;
 			var num = 5;
 			var nodeList = [];
 			var mouse_click = new THREE.Vector2(),INTERSECTED_M,INTERSECTED_C;
@@ -62,10 +63,11 @@
 			var closeToPortal = [ false , false ] , portalId = [] ;
 			var timeOrigin = [] ;
 			var controlled = [] ;
+			var controlSpeedUp = [];
 			var portalColor = [] ;
 			
 			//buff variables
-			var PortalEffect = [] ;//-1: none, 0: speed buff, 1: score buff
+			var PortalEffect = [] ;//-1: none, 0: speed buff, 1: score buff, 2: 100 points, 3: speed up control
 			var buffStartTime = [] ;
 			var buffDuration = [] ;
 			var buffResetTime = [];
@@ -96,6 +98,8 @@
 
 			function init() { //{{{
 				// camera
+				console.log(Math.floor(Math.random()*3));
+				
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.set(0,-400,800);
 
@@ -330,8 +334,14 @@
 					var nearPortal = [false, false];
 					for ( var j = 0 ; j < 2 ; j ++ ) {
 						if ( Math.hypot( helicopter[ j ].position.x - x[i] , helicopter[ j ].position.y - y[i] ) < 20) {
-							if ( j == 0 && portalColor[ i ] < 300 ) portalColor[ i ] ++ ;
-							else if ( j == 1 && portalColor[ i ] > -300 ) portalColor[ i ] -- ;
+							if ( j == 0 && portalColor[ i ] < 300 ){
+								portalColor[ i ] ++ ;
+								if(controlSpeedUp[j]) portalColor[ i ] ++ ;
+							}
+							else if ( j == 1 && portalColor[ i ] > -300 ){
+								portalColor[ i ] -- ;
+								if(controlSpeedUp[j]) portalColor[ i ] -- ;
+							} 
 							nearPortal[j] = true;
 						}
 						else {
@@ -393,18 +403,34 @@
 				//Speed Buff
 				PortalEffect[0] = 0;
 				PortalEffect[1] = 1;
+				PortalEffect[2] = 2;
+				PortalEffect[3] = 3;
+				
+				controlSpeedUp = [false, false];
 				for(var i = 0; i < num; i++){
 					if(PortalEffect[i] == 0){
 						buffDuration[i] = 60000;
 						buffResetTime[i] = 120000;
 						buffExist[i] = true;
-						buffActivated[i] = false;
+						buffActivated[i] = -1;
 					}
 					if(PortalEffect[i] == 1){
 						buffDuration[i] = 30000;
 						buffResetTime[i] = 120000;
 						buffExist[i] = true;
-						buffActivated[i] = false;
+						buffActivated[i] = -1;
+					}
+					if(PortalEffect[i] == 2){
+						buffDuration[i] = 0;
+						buffResetTime[i] = 120000;
+						buffExist[i] = true;
+						buffActivated[i] = -1;
+					}
+					if(PortalEffect[i] == 3){
+						buffDuration[i] = 60000;
+						buffResetTime[i] = 120000;
+						buffExist[i] = true;
+						buffActivated[i] = -1;
 					}
 				}
 				
@@ -414,30 +440,45 @@
 			function getBuff(i, j){
 				if(buffExist[i]){
 					if(PortalEffect[i] == 0){
-						velocity[j] = 2 * velocity[j];
+						velocity[j] *= 2;
 						buffStartTime[i] = Date.now();
 						buffExist[i] = false;
-						buffActivated[i] = true;
+						buffActivated[i] = j;
 					}
 					if(PortalEffect[i] == 1){
-						scoreRatio[j] = 2 * scoreRatio[j];
+						scoreRatio[j] *= 2;
 						buffStartTime[i] = Date.now();
 						buffExist[i] = false;
-						buffActivated[i] = true;
+						buffActivated[i] = j;
+					}
+					if(PortalEffect[i] == 2){
+						score[j] += 100;
+						buffStartTime[i] = Date.now();
+						buffExist[i] = false;
+					}
+					if(PortalEffect[i] == 3){
+						controlSpeedUp[j] = true;
+						buffStartTime[i] = Date.now();
+						buffExist[i] = false;
+						buffActivated[i] = j;
 					}
 				}
 			}
-			//Buff detector
+			//Buffs halt
 			function BuffDetector(){
 				for(var i=0;i<num;i++){
-					if(buffActivated[i]){
+					if(buffActivated[i] != -1){
 						if(PortalEffect[i] == 0 && (Date.now() - buffStartTime[i] > buffDuration[i])){
-							velocity[i] = velocity[i] / 2;
-							buffActivated[i] = false;
+							velocity[buffActivated[i]] /= 2;
+							buffActivated[i] = -1;
 						}
 						if(PortalEffect[i] == 1 && (Date.now() - buffStartTime[i] > buffDuration[i])){
-							scoreRatio[i] = scoreRatio[i] / 2;
-							buffActivated[i] = false;
+							scoreRatio[buffActivated[i]] /= 2;
+							buffActivated[i] = -1;
+						}
+						if(PortalEffect[i] == 3 && (Date.now() - buffStartTime[i] > buffDuration[i])){
+							controlSpeedUp[buffActivated[i]] = false;
+							buffActivated[i] = -1;
 						}
 					}
 					
