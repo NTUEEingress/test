@@ -38,8 +38,8 @@
 			MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
 			</br>Score : <font id="score"></font><button onclick="reinit()">Restart</button>
 
-			</br>Gametime : <font id="score"></font>
-		</div>			
+			</br>Gametime : <font id="gametime"></font>
+		</div>
 
 		<script src="../build/three.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -64,9 +64,7 @@
 			var num = 5;
 			var nodeList = [];
 			var x = [], y = [];
-				var controlled = [] ;
 				var portalColor = [] ;
-				var PortalEffect = [];//0: none,1: speed buff,
 				var radius = 40, sections = 32;
 				var ball_basic_clolor = 0xffffff;
 			// outline setting
@@ -76,8 +74,10 @@
 				var inner_radius = radius;
 				var outer_radius = 50;
 				var outline_color = 0xffff00;
+			/*
 			//buffs setting
 			var activated = [];
+			*/
 			var counter = [];
 			//helicopter setting
 			var helicopter = [] , velocity = [] , destination = [] , move_or_not = [ false , false ] ;
@@ -92,8 +92,8 @@
 			var timeOrigin = [] ;
 			var controlled = [] ;
 			var controlSpeedUp = [];
-			var portalColor = [] ;
 			
+			var gameStartTime;
 			//buff variables
 			var PortalEffect = [] ;//-1: none, 0: speed buff, 1: score buff, 2: 100 points, 3: speed up control
 			var buffStartTime = [] ;
@@ -151,7 +151,7 @@
 				
 				//score
 				scoreStartTime = Date.now();
-				
+				gameStartTime = Date.now();
 				
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xcccccc, 0 );
@@ -412,6 +412,10 @@
 				}
 			}
 			function setCircle( i, numOfSegment ){
+				if (Math.abs(numOfSegment) > pieces){
+					if(numOfSegment > 0)	numOfSegment = pieces;
+					else					numOfSegment = -1 * pieces;
+				}
 				for(var j = 0; j < Math.abs(numOfSegment); j++){
 					if( numOfSegment > 0 ){
 						circleSegment[i][j].material.visible = true;
@@ -425,7 +429,7 @@
 					if( numOfSegment > 0 ){
 						circleSegment[i][j].material.visible = false;			
 					}else if( numOfSegment <= 0 ){
-						circleSegment[i][pieces - j-1].material.visible = false;						
+						circleSegment[i][pieces - j - 1].material.visible = false;						
 					}
 				}
 			}
@@ -565,7 +569,7 @@
 
 				
 			}
-			
+			//update gametime
 			function updatescore(){
 				/*for(var i=0;i!=2;i++)
 				{
@@ -582,6 +586,9 @@
 				}
 				scoreStartTime = timeNow;
 				document.getElementById("score").innerHTML = Math.floor(score[0])+":"+Math.floor(score[1]);
+				var gameTimeMin = ((Date.now() - gameStartTime) / 1000) / 60;
+				var gameTimeSec = ((Date.now() - gameStartTime) / 1000) % 60;
+				document.getElementById("gametime").innerHTML = Math.floor(gameTimeMin) + " min " + Math.floor(gameTimeSec) + " sec";
 			}
 
 		</script>
