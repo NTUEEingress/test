@@ -31,14 +31,14 @@
 			}
 		</style>
 	</head>
-
 	<body>
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - trackball controls example</br>
 			MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
 			</br>Score : <font id="score"></font><button onclick="reinit()">Restart</button>
-		</div>			
+		</div>
+		
 		<script src="../build/three.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
@@ -49,34 +49,42 @@
 		<script>
 
 			if ( !Detector.webgl ) Detector.addGetWebGLMessage();
-
+			//environment setting
 			var container, stats;
-
-			var camera, controls, scene, renderer, raycaster,raycaster_move_heli;
-			var num = 5;
-			var nodeList = [];
+			var camera, controls, scene, renderer;
+			//mouse setting
+			var raycaster;
 			var mouse_click = new THREE.Vector2(),INTERSECTED_M,INTERSECTED_C;
 			var mouse_move = new THREE.Vector2();
+			//portal setting
+			var num = 5;
+			var nodeList = [];
 			var x = [], y = [];
-			var helicopter = [] , velocity = [] , destination = [] , move_or_not = [ false , false ] ;
-			var closeToPortal = [ false , false ] , portalId = [] ;
-			var timeOrigin = [] ;
-			var controlled = [] ;
-			var portalColor = [] ;
-			var PortalEffect = [];//0: none,1: speed buff,
-			var CountStart = 0 , NUM = "6" , NUMP = "6" , PID = 5 , Source = 0 ;
-			var MAP = new Map() ; MAP.set( "6" , 1 ) ;
-			//for score
-			var SCORES=0;
-			var tower=[0,0];
-			var score=[0,0];
-			//for buffs
+				var controlled = [] ;
+				var portalColor = [] ;
+				var PortalEffect = [];//0: none,1: speed buff,
+				var radius = 40, sections = 32;
+				var ball_basic_clolor = 0xffffff;
+			// outline setting
+			var outlineOffset = num ;
+			var circleSegment = new Array(num);
+			var pieces = 60;
+				var inner_radius = radius;
+				var outer_radius = 50;
+				var outline_color = 0xffff00;
+			//buffs setting
 			var activated = [];
 			var counter = [];
-			// outline
-			var outlineOffset = 5 ;
-			var circleSegment = new Array(5);
-			var pieces = 60;
+			//helicopter setting
+			var helicopter = [] , velocity = [] , destination = [] , move_or_not = [ false , false ] ;
+			var closeToPortal = [ false , false ] , portalId = [] ;
+				var helicopter_radius = 35;
+				var hori_sections = 20;
+				var vert_sections = 20;
+				var helicopter_color = [0xff0000,0x00ff00];
+			//scores setting
+			var tower=[0,0];
+			var score=[0,0];
 
 			init();
 			animate();
@@ -107,10 +115,10 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xcccccc, 0 );
 				//Circles
-				var geometry_circle = new THREE.CircleGeometry(40,32);
+				var geometry_circle = new THREE.CircleGeometry( radius , sections);
 
 				for ( var i = 0 ; i < num ; i ++ ) {
-					var mesh_circle = new THREE.Mesh(geometry_circle,new THREE.MeshBasicMaterial( { color: 0xffffff} ));
+					var mesh_circle = new THREE.Mesh(geometry_circle,new THREE.MeshBasicMaterial( { color: ball_basic_clolor} ));
 					do {
 						x[i] = Math.random() * 480 - 240;
 						y[i] = Math.random() * 480 - 240;
@@ -134,8 +142,8 @@
 					
 				//outline
 				for ( var i = 0 ; i < num ; i ++ ) {
-					var outline_geometry = new THREE.RingGeometry( 40, 50, 32 , 8 , 0 , 0 ) ;
-					var outlineMaterial1 = new THREE.MeshBasicMaterial( { color: 0xffff00, side: THREE.DoubleSide } ) ;
+					var outline_geometry = new THREE.RingGeometry( inner_radius, outer_radius, 32 , 8 , 0 , 0 ) ;
+					var outlineMaterial1 = new THREE.MeshBasicMaterial( { color: outline_color, side: THREE.DoubleSide } ) ;
 					var outlineMesh1 = new THREE.Mesh( outline_geometry, outlineMaterial1 ) ;
 					outlineMesh1.position.x = x[ i ] ;
 					outlineMesh1.position.y = y[ i ] ;
@@ -149,10 +157,10 @@
 
 				// helicopter
 				for ( var i = 0 ; i < 2 ; i ++ ) {
-					var geometry_helicopter = new THREE.SphereGeometry( 35 , 20 , 20 ) ;
+					var geometry_helicopter = new THREE.SphereGeometry( helicopter_radius , hori_sections , vert_sections ) ;
 					var material_helicopter ;
-					if ( i == 1 ) material_helicopter = new THREE.MeshLambertMaterial( { color: 0x00ff00 } ) ;
-					else material_helicopter = new THREE.MeshLambertMaterial( { color: 0xff0000 } ) ;
+					if ( i == 1 ) material_helicopter = new THREE.MeshLambertMaterial( { color: helicopter_color[1] } ) ;
+					else material_helicopter = new THREE.MeshLambertMaterial( { color: helicopter_color[0] } ) ;
 					helicopter[ i ] = new THREE.Mesh( geometry_helicopter , material_helicopter ) ;
 					velocity[ i ] = 5 ;
 					helicopter[ i ].position.x = x[ 0 ] ;
