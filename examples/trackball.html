@@ -145,13 +145,7 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xcccccc, 0 );
 				//Circles
-<<<<<<< HEAD
 				var geometry_circle = new THREE.CircleGeometry( radius , sections);
-=======
-				
-				//score
-				scoreStartTime = Date.now();
-
 				for ( var i = 0 ; i < num ; i ++ ) {
 					var mesh_circle = new THREE.Mesh(geometry_circle,new THREE.MeshBasicMaterial( { color: ball_basic_clolor} ));
 					do {
@@ -220,6 +214,8 @@
 						scene.add( circleSegment[i][j] );
 					}
 				}
+				//score
+				scoreStartTime = Date.now();
 				/*
 				//Buffs
 				for(var i=0;i<num;i++){
