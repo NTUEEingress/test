@@ -65,7 +65,7 @@
 			var portalColor = [] ;
 			
 			//buff variables
-			var PortalEffect = [] ;//-1: none,0: speed buff,
+			var PortalEffect = [] ;//-1: none, 0: speed buff, 1: score buff
 			var buffStartTime = [] ;
 			var buffDuration = [] ;
 			var buffResetTime = [];
@@ -84,7 +84,8 @@
 			var SCORES=0;
 			var tower=[0,0];
 			var score=[0,0];
-			
+			var scoreStartTime;
+			var scoreRatio=[1,1];
 			// outline
 			var outlineOffset = 5 ;
 			var circleSegment = new Array(5);
@@ -119,6 +120,10 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xcccccc, 0 );
 				//Circles
+				
+				//score
+				scoreStartTime = Date.now();
+				
 				var geometry_circle = new THREE.CircleGeometry(40,32);
 
 				for ( var i = 0 ; i < num ; i ++ ) {
@@ -387,10 +392,16 @@
 			function SetPortalEffect(){
 				//Speed Buff
 				PortalEffect[0] = 0;
-				
+				PortalEffect[1] = 1;
 				for(var i = 0; i < num; i++){
 					if(PortalEffect[i] == 0){
 						buffDuration[i] = 60000;
+						buffResetTime[i] = 120000;
+						buffExist[i] = true;
+						buffActivated[i] = false;
+					}
+					if(PortalEffect[i] == 1){
+						buffDuration[i] = 30000;
 						buffResetTime[i] = 120000;
 						buffExist[i] = true;
 						buffActivated[i] = false;
@@ -407,7 +418,12 @@
 						buffStartTime[i] = Date.now();
 						buffExist[i] = false;
 						buffActivated[i] = true;
-						
+					}
+					if(PortalEffect[i] == 1){
+						scoreRatio[j] = 2 * scoreRatio[j];
+						buffStartTime[i] = Date.now();
+						buffExist[i] = false;
+						buffActivated[i] = true;
 					}
 				}
 			}
@@ -417,7 +433,10 @@
 					if(buffActivated[i]){
 						if(PortalEffect[i] == 0 && (Date.now() - buffStartTime[i] > buffDuration[i])){
 							velocity[i] = velocity[i] / 2;
-							
+							buffActivated[i] = false;
+						}
+						if(PortalEffect[i] == 1 && (Date.now() - buffStartTime[i] > buffDuration[i])){
+							scoreRatio[i] = scoreRatio[i] / 2;
 							buffActivated[i] = false;
 						}
 					}
@@ -481,14 +500,16 @@
 					score[i]+=tower[i]*100;
 					
 				}*/
+				var timeNow = Date.now();
 				for(var i=0;i<num;i++)
 				{
-					if(portalColor[i]==300)
-						score[0]++;
-					else if(portalColor[i]==-300)
-						score[1]++;
+					if(controlled[i]==0)
+						score[0] += scoreRatio[0] * (timeNow - scoreStartTime) / 1000;
+					else if(controlled[i]==1)
+						score[1] += scoreRatio[1] * (timeNow - scoreStartTime) / 1000;
 				}
-				document.getElementById("score").innerHTML = score[0]+":"+score[1];
+				scoreStartTime = timeNow;
+				document.getElementById("score").innerHTML = Math.floor(score[0])+":"+Math.floor(score[1]);
 			}
 
 		</script>
