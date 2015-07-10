@@ -128,7 +128,7 @@
 
 			function init() { //{{{
 				// camera
-				console.log(Math.floor(Math.random()*3));
+				
 				
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.set(0,-400,800);
@@ -304,6 +304,8 @@
 
 			} //}}}
 			function reinit(){
+				BuffDetector(Date.now() + 200000);
+				BuffResetDetector(Date.now() + 200000);
 				SetPortalEffect();
 				camera.position.set(0,-400,800);
 				for(var i=0;i<2;i++){
@@ -453,8 +455,7 @@
 			}
 			//portalEffect manager
 			function SetRandomPortal(i){
-				//PortalEffect[i] = Math.floor(8 * Math.random());
-				PortalEffect[i] = 0;
+				PortalEffect[i] = Math.floor(8 * Math.random());
 				buffResetTime[i] = 120000;
 				if(PortalEffect[i] == 0){
 					buffDuration[i] = 60000;
@@ -484,19 +485,19 @@
 			}
 			function SetPortalEffect(){
 				//Speed Buff
-				/*
-				PortalEffect[0] = 0;
-				PortalEffect[1] = 1;
-				PortalEffect[2] = 2;
-				PortalEffect[3] = 3;
-				PortalEffect[4] = -1; //effect 0~3, reset all portals, remove all buffs, cannot control, enemy cannot control
-				*/
-				PortalEffect[0] = -1;
-				PortalEffect[1] = -1;
-				PortalEffect[2] = -1;
-				PortalEffect[3] = -1;
-				PortalEffect[4] = -1;
 				
+				PortalEffect[0] = -1;
+				PortalEffect[1] = 0;
+				PortalEffect[2] = 0;
+				PortalEffect[3] = 0;
+				PortalEffect[4] = 0; //effect 0~3, reset all portals, remove all buffs, cannot control, enemy cannot control
+				
+				/*
+				PortalEffect[1] = 0;
+				PortalEffect[2] = 1;
+				PortalEffect[3] = 2;
+				PortalEffect[4] = 3;
+				*/
 				controlSpeedUp = [false, false];
 				ableToControl = [true, true];
 				for(var i = 0; i < num; i++){
@@ -570,17 +571,10 @@
 					}
 					else if(PortalEffect[i] == 5){
 						BuffDetector(Date.now() + 200000);
-						BuffResetDetector(Date.now() + 200000);
 						buffStartTime[i] = Date.now();
 						buffExist[i] = false;
 					}
 					else if(PortalEffect[i] == 6){
-						BuffDetector(Date.now() + 200000);
-						BuffResetDetector(Date.now() + 200000);
-						buffStartTime[i] = Date.now();
-						buffExist[i] = false;
-					}
-					else if(PortalEffect[i] == 7){
 						ableToControl[j] = false;
 						buffStartTime[i] = Date.now();
 						buffExist[i] = false;
