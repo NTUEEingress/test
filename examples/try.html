@@ -103,7 +103,7 @@
 			var buffExist = [];
 			var buffActivated = [];
 			var isRandom = [];
-			// map
+			// BL building
 			var bl = new THREE.Object3D();
 			/*
 			//for buffs
@@ -284,15 +284,15 @@
 				var line = new THREE.Line( geometry_plane,material_plane,THREE.LinePieces );
 				scene.add(line);
 					
-				//map
+				//BL building
 				
 				var loader_bl = new THREE.ColladaLoader();
-				loader_bl.load('blmodel.dae',
+				loader_bl.load('bl_model.dae',
 								function(result){
 									result.scene.scale.divideScalar(0.1);
 									bl = result.scene;
 									scene.add(bl);
-									render();
+									//render();
 								}
 				
 				);
