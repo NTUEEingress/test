@@ -54,7 +54,7 @@
 			//environment setting
 			var container, stats;
 
-			var camera, controls, scene, renderer;
+			var camera, controls, scene, renderer, bl;
 			//mouse setting
 			var raycaster;
 
@@ -103,6 +103,8 @@
 			var buffExist = [];
 			var buffActivated = [];
 			var isRandom = [];
+			// map
+			var bl = new THREE.Object3D();
 			/*
 			//for buffs
 			
@@ -149,7 +151,6 @@
 
 				controls.addEventListener( 'change', render );
 
-				// world
 				
 				//score
 				scoreStartTime = Date.now();
@@ -157,12 +158,10 @@
 				
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xcccccc, 0 );
+
 				//Circles
 
 				var geometry_circle = new THREE.CircleGeometry( radius , sections);
-
-				
-				
 
 				for ( var i = 0 ; i < num ; i ++ ) {
 					var mesh_circle = new THREE.Mesh(geometry_circle,new THREE.MeshBasicMaterial( { color: ball_basic_clolor} ));
@@ -220,16 +219,18 @@
 					scene.add( helicopter[ i ] ) ;
 				}
 				var loader = new THREE.ColladaLoader();
-				loader.load('ar-drone-2.dae', function(result) {
-					result.scene.scale.divideScalar(2);
-					console.log("=DDD");
-					helicopter.forEach(function(h) {
-					    var s = result.scene.clone();
-						h.add(s);
-						console.log("=))))");
-					});
-					render();
-				});
+				loader.load('ar-drone-2.dae', 
+							function(result) {
+							result.scene.scale.divideScalar(2);
+							console.log("=DDD");
+							helicopter.forEach(function(h) {
+								var s = result.scene.clone();
+								h.add(s);
+								console.log("=))))");
+							});
+							render();
+							}		
+				);
 				
 				destination[ 0 ] = new THREE.Vector2(x[0], y[0]);
 				destination[ 1 ] = new THREE.Vector2(x[0], y[0]);
@@ -280,7 +281,20 @@
 				}
 				var line = new THREE.Line( geometry_plane,material_plane,THREE.LinePieces );
 				scene.add(line);
-
+					
+				//map
+				
+				var loader_bl = new THREE.ColladaLoader();
+				loader_bl.load('blmodel.dae',
+								function(result){
+									bl = result.scene.clone();
+									render();
+								}
+				
+				);
+				scene.add(bl);
+				console.log(bl);
+				
 				// renderer
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( scene.fog.color );
