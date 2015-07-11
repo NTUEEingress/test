@@ -63,7 +63,7 @@
 			//portal setting
 			var num = 5;
 			var nodeList = [];
-			var x = [], y = [];
+			var x = [], y = [], z = 75;
 				var portalColor = [] ;
 				var radius = 40, sections = 32;
 				var ball_basic_clolor = 0xffffff;
@@ -133,7 +133,7 @@
 				
 				
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
-				camera.position.set(0,-400,800);
+				camera.position.set(0,-400,1800);
 
 				controls = new THREE.TrackballControls( camera );
 
@@ -179,6 +179,7 @@
 					} while ( true ) ;
 					mesh_circle.position.x = x[i];
 					mesh_circle.position.y = y[i];
+					mesh_circle.position.z = z;
 					controlled[ i ] = 100;
 					portalColor[ i ] = 0 ;
 					scene.add( mesh_circle ) ;
@@ -214,7 +215,7 @@
 					//helicopter[i].add(sss);
 					helicopter[ i ].position.x = x[ 0 ] ;
 					helicopter[ i ].position.y = y[ 0 ] ;
-					helicopter[ i ].position.z = 35 * ( i * 2 - 1 ) ;
+					helicopter[ i ].position.z = z * ( i * 2 - 1 ) ;
 					
 					scene.add( helicopter[ i ] ) ;
 				}
@@ -243,6 +244,7 @@
 						circleSegment[i][j] = new THREE.Mesh( outline_geometry, outlineMaterial1 ) ;
 						circleSegment[i][j].position.x = x[ i ] ;
 						circleSegment[i][j].position.y = y[ i ] ;
+						circleSegment[i][j].position.z = z;
 						circleSegment[i][j].material.visible = false;
 						
 						scene.add( circleSegment[i][j] );
@@ -287,13 +289,13 @@
 				var loader_bl = new THREE.ColladaLoader();
 				loader_bl.load('blmodel.dae',
 								function(result){
-									bl = result.scene.clone();
+									result.scene.scale.divideScalar(0.1);
+									bl = result.scene;
+									scene.add(bl);
 									render();
 								}
 				
 				);
-				scene.add(bl);
-				console.log(bl);
 				
 				// renderer
 				renderer = new THREE.WebGLRenderer();
