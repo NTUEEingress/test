@@ -81,7 +81,7 @@
 			*/
 			var counter = [];
 			//helicopter setting
-			var helicopter = [] , velocity = [] , destination = [] , move_or_not = [ false , false ] ;
+			var helicopter = [] , velocity = [] , destination = [] ,startpointx = [],startpointy = [] , move_or_not = [ false , false ], time_init = []; ;
 			var closeToPortal = [ false , false ] , portalId = [] ;
 				var helicopter_radius = 35;
 				var hori_sections = 20;
@@ -336,7 +336,7 @@
 					helicopter[i].position.y = y[0];
 					destination[i].x = x[0];
 					destination[i].y = y[0];
-					velocity[i] = 5;
+					velocity[i] = 0.1;
 					
 				}
 				score = [0,0];
@@ -368,7 +368,6 @@
 				mouse_move.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 			}
 			function onDocumentMouseDown( event ) {
-				var time_init = [];
 				event.preventDefault() ;
 
 				var button = event.button ;
@@ -386,11 +385,15 @@
 					if ( button == 0 ) {
 						destination[ 0 ].x = intersect_click[0].object.position.x;
 						destination[ 0 ].y = intersect_click[0].object.position.y;
+						startpointx[0] = helicopter[0].position.x;
+						startpointy[0] = helicopter[0].position.y;
 						move_or_not[ 0 ] = true ;
 						time_init[0] = Date.now();
 					} else if ( button == 2 ) {
 						destination[ 1 ].x = intersect_click[0].object.position.x;
 						destination[ 1 ].y = intersect_click[0].object.position.y;
+						startpointx[1] = helicopter[1].position.x;
+						startpointy[1] = helicopter[1].position.y;
 						move_or_not[ 1 ] = true ;
 						time_init[1] = Date.now();
 					}
@@ -412,7 +415,7 @@
 				var delta = (TimeNow - colorCountTime) * 3 / 50;
 				colorCountTime = TimeNow;
 				for ( var i = 0 ; i < num ; i ++ ) {
-					var nearPortal = [falese, false];
+					var nearPortal = [false, false];
 					for ( var j = 0 ; j < 2 ; j ++ ) {
 						if ( Math.hypot( helicopter[ j ].position.x - x[i] , helicopter[ j ].position.y - y[i] ) < 50) {
 							if ( j == 0 && portalColor[ i ] < 300 && ableToControl[j]){
@@ -679,13 +682,19 @@
 				var Time = Date.now();
 				for ( var i = 0 ; i < 2 ; i ++ ) {
 					if( Math.hypot( destination[ i ].x - helicopter[ i ].position.x , destination[ i ].y - helicopter[ i ].position.y )
-					   <= velocity[ i ] ) {
+					   <= 50 ) {
 						move_or_not[ i ] = false;
+					}else if( Math.hypot( helicopter[i].position.x - startpointx[i], destination[i].y - startpointy[i] ) > 
+							
+					){
+						move_or_not[ i ] = false;
+						helicopter[i].position.x = destination[ i ].x;
+						helicopter[i].position.y = destination[ i ].y;
 					} else if ( move_or_not[ i ] == true ) {
 						var distance = Math.hypot( destination[ i ].x - helicopter[ i ].position.x , destination[ i ].y - helicopter[ i ].position.y ) ;
-						helicopter[ i ].position.x += velocity[ i ] * ( destination[ i ].x - helicopter[ i ].position.x ) / distance ;
-						helicopter[ i ].position.y += velocity[ i ] * ( destination[ i ].y - helicopter[ i ].position.y ) / distance ;
-
+						helicopter[ i ].position.x = startpointx[i] + ( Time - time_init[i] ) * velocity[ i ] * ( destination[ i ].x - helicopter[ i ].position.x ) / distance ;
+						helicopter[ i ].position.y = startpointy[i] + (  Time - time_init[i]) * velocity[ i ] * ( destination[ i ].y - helicopter[ i ].position.y ) / distance ;
+						
 					}
 				}
 
