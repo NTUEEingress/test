@@ -368,6 +368,7 @@
 				mouse_move.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 			}
 			function onDocumentMouseDown( event ) {
+				var time_init = [];
 				event.preventDefault() ;
 
 				var button = event.button ;
@@ -386,10 +387,12 @@
 						destination[ 0 ].x = intersect_click[0].object.position.x;
 						destination[ 0 ].y = intersect_click[0].object.position.y;
 						move_or_not[ 0 ] = true ;
+						time_init[0] = Date.now();
 					} else if ( button == 2 ) {
 						destination[ 1 ].x = intersect_click[0].object.position.x;
 						destination[ 1 ].y = intersect_click[0].object.position.y;
 						move_or_not[ 1 ] = true ;
+						time_init[1] = Date.now();
 					}
 				}
 			}
@@ -409,7 +412,7 @@
 				var delta = (TimeNow - colorCountTime) * 3 / 50;
 				colorCountTime = TimeNow;
 				for ( var i = 0 ; i < num ; i ++ ) {
-					var nearPortal = [false, false];
+					var nearPortal = [falese, false];
 					for ( var j = 0 ; j < 2 ; j ++ ) {
 						if ( Math.hypot( helicopter[ j ].position.x - x[i] , helicopter[ j ].position.y - y[i] ) < 50) {
 							if ( j == 0 && portalColor[ i ] < 300 && ableToControl[j]){
@@ -673,6 +676,7 @@
 
 			function render_click(){
 				//move helicopter
+				var Time = Date.now();
 				for ( var i = 0 ; i < 2 ; i ++ ) {
 					if( Math.hypot( destination[ i ].x - helicopter[ i ].position.x , destination[ i ].y - helicopter[ i ].position.y )
 					   <= velocity[ i ] ) {
