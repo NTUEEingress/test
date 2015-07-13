@@ -220,7 +220,7 @@
 					//helicopter[i].add(sss);
 					helicopter[ i ].position.x = x[ 0 ] ;
 					helicopter[ i ].position.y = y[ 0 ] ;
-					helicopter[ i ].position.z = z * ( i * 2 - 1 ) ;
+					helicopter[ i ].position.z = z * ( i * 2 + 1 ) ;
 					
 					scene.add( helicopter[ i ] ) ;
 				}
@@ -422,7 +422,9 @@
 							} 
 							nearPortal[j] = true;
 						}
-						else {
+					}
+					for ( var j = 0 ; j < 2 ; j ++){
+						if( !nearPortal[j] ){
 							if ( j == 0 && portalColor[ i ] > 0 && portalColor[ i ] < 300 && controlled[i] != 0) portalColor[ i ] -= delta ;
 							else if ( j == 1 && portalColor[ i ] < 0 && portalColor[ i ] > -300 && controlled[i] != 1) portalColor[ i ] += delta ;
 						}
@@ -431,31 +433,29 @@
 					if ( controlled[i] == 0 && portalColor[ i ] < 300 && !( !nearPortal[0] && nearPortal[1] ))	portalColor[ i ] += delta ;
 					else if ( controlled[i] == 1 && portalColor[ i ] > -300 && !( !nearPortal[1] && nearPortal[0] ))	portalColor[ i ] -= delta ;
 					
-					if ( portalColor[ i ] == 0 ){
+					if ( (portalColor[ i ] <= 0 && controlled[i] == 0) || (portalColor[ i ] >= 0 && controlled[i] == 1)){
 						scene.children[ i ].material.color.setHex( 0xffffff ) ;
 						controlled[i] = 100;
 					}
 					else if ( portalColor[ i ] > 0 ) {
-						scene.children[ i ].material.color.setHex( 0xffffff - 0x000101 * Math.floor( portalColor[ i ] / 300 * 255 ) ) ;
-						//delete scene.children[ outlineOffset + i].geometry;
-						//scene.children[ outlineOffset + i].geometry = new THREE.RingGeometry( 40, 50, 20 , 0 , 0 , portalColor[ i ] / 300 * Math.PI * 2 ) ;
-						
 						if ( portalColor[ i ] >= 300 ){
 							portalColor[ i ] = 300;
 							controlled[i] = 0;
 							getBuff(i, 0);
 						}
-					
-					} else if ( portalColor[ i ] < 0 ) {
-						scene.children[ i ].material.color.setHex( 0xffffff - 0x010001 * Math.floor( -portalColor[ i ] / 300 * 255 ) ) ;
+						scene.children[ i ].material.color.setHex( 0xffffff - 0x000101 * Math.floor( portalColor[ i ] / 300 * 255 ) ) ;
 						//delete scene.children[ outlineOffset + i].geometry;
 						//scene.children[ outlineOffset + i].geometry = new THREE.RingGeometry( 40, 50, 20 , 0 , 0 , portalColor[ i ] / 300 * Math.PI * 2 ) ;
 						
+					} else if ( portalColor[ i ] < 0 ) {
 						if ( portalColor[ i ] <= -300 ){
-							portalColor[ i ] = -300;
-							controlled[i] = 1;
-							getBuff(i, 1);
-						}
+								portalColor[ i ] = -300;
+								controlled[i] = 1;
+								getBuff(i, 1);
+							}
+						scene.children[ i ].material.color.setHex( 0xffffff - 0x010001 * Math.floor( -portalColor[ i ] / 300 * 255 ) ) ;
+						//delete scene.children[ outlineOffset + i].geometry;
+						//scene.children[ outlineOffset + i].geometry = new THREE.RingGeometry( 40, 50, 20 , 0 , 0 , portalColor[ i ] / 300 * Math.PI * 2 ) ;
 					}
 					setCircle( i, Math.floor( portalColor[ i ] / 300 * pieces ) );
 				}
