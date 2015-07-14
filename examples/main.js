@@ -32,12 +32,15 @@ var helicopter = [],
 velocity = [],
 destination = [],
 move_or_not = [false, false];
+var initialposition = [];
 var closeToPortal = [false, false],
 portalId = [];
 var helicopter_radius = 35;
 var hori_sections = 20;
 var vert_sections = 20;
 var helicopter_color = [0xff0000, 0x00ff00];
+var time_init = [];
+var Time;
 //scores setting
 var tower = [0, 0];
 var score = [0, 0];
@@ -158,7 +161,7 @@ function init() {
 		  if ( i == 1 ) material_helicopter = new THREE.MeshLambertMaterial( { color: helicopter_color[1] } ) ;
 		  else material_helicopter = new THREE.MeshLambertMaterial( { color: helicopter_color[0] } ) ;
 		  var sss = new THREE.Mesh( geometry_helicopter , material_helicopter ) ;*/
-		velocity[i] = 5;
+		velocity[i] = 100;
 
 		helicopter[i] = new THREE.Object3D();
 		//helicopter[i].add(sss);
@@ -182,7 +185,14 @@ function init() {
 
 	destination[0] = new THREE.Vector2(x[0], y[0]);
 	destination[1] = new THREE.Vector2(x[0], y[0]);
-
+	initialposition[0] = new THREE.Vector2(x[0], y[0]);
+	initialposition[1] = new THREE.Vector2(x[0], y[0]);
+	for(var i=0;i<2;i++){
+		destination[i].x = x[0];
+		destination[i].y = y[0];
+		initialposition[i].x = x[0] ;
+		initialposition[i].y = y[0] ;
+	}
 	//Timer(outline) init
 	for (var i = 0; i < num; i++) {
 		circleSegment[i] = new Array(pieces);
@@ -320,7 +330,12 @@ function onDocumentMouseDown(event) {
 	var intersect_click = raycaster.intersectObjects(nodeList);
 
 	if (intersect_click.length > 0) {
-		for (var i = 0; i < num; i++) {
+		time_init[uid] = Date.now();
+		initialposition[uid].x = helicopter[uid].position.x;
+		initialposition[uid].y = helicopter[uid].position.y;
+		destination[uid].x = intersect_click[0].object.position.x;
+		destination[uid].y = intersect_click[0].object.position.y;
+			for (var i = 0; i < num; i++) {
 			if (x[i] == intersect_click[0].object.position.x && y[i] == intersect_click[0].object.position.y) {
 				var mouseclick = new CustomEvent('mouseclick', {
 					'detail': uid * 10 + i
@@ -331,6 +346,7 @@ function onDocumentMouseDown(event) {
 			}
 		}
 	}
+	console.log(destination[uid].x,destination[uid].y);
 }
 
 function receiveMouseEvent(uid, portalid) {
@@ -578,18 +594,21 @@ function AutoGetBuff() {
 
 function render_click() {
 	//move helicopter
+	Time = Date.now();
 	for (var i = 0; i < 2; i++) {
-		if (Math.hypot(destination[i].x - helicopter[i].position.x, destination[i].y - helicopter[i].position.y) <= velocity[i]) {
+		if (Math.hypot(destination[i].x - helicopter[i].position.x, destination[i].y - helicopter[i].position.y) <= 20 ) {
 			helicopter[i].position.x = destination[i].x;
 			helicopter[i].position.y = destination[i].y;
 			move_or_not[i] = false;
 		} else if (move_or_not[i] == true) {
 			var distance = Math.hypot(destination[i].x - helicopter[i].position.x, destination[i].y - helicopter[i].position.y);
-			helicopter[i].position.x += velocity[i] * (destination[i].x - helicopter[i].position.x) / distance;
-			helicopter[i].position.y += velocity[i] * (destination[i].y - helicopter[i].position.y) / distance;
+			helicopter[i].position.x = initialposition[i].x + velocity[i] * (destination[i].x - helicopter[i].position.x) / distance * ( Time - time_init[i] )/1000;
+			helicopter[i].position.y = initialposition[i].y + velocity[i] * (destination[i].y - helicopter[i].position.y) / distance * ( Time - time_init[i] )/1000;
 		}
 	}
 	renderer.render(scene, camera);
+	console.log(destination[uid].x,destination[uid].y);
+	console.log(helicopter[uid].position.x,helicopter[uid].position.y);
 }
 function render() {
 	renderer.render(scene, camera);
