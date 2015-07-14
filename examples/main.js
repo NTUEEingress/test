@@ -143,7 +143,7 @@ function init() {
 		  if ( i == 1 ) material_helicopter = new THREE.MeshLambertMaterial( { color: helicopter_color[1] } ) ;
 		  else material_helicopter = new THREE.MeshLambertMaterial( { color: helicopter_color[0] } ) ;
 		  var sss = new THREE.Mesh( geometry_helicopter , material_helicopter ) ;*/
-		velocity[i] = 100;
+		velocity[i] = 50;
 
 		helicopter[i] = new THREE.Object3D();
 		//helicopter[i].add(sss);
@@ -241,7 +241,6 @@ function init() {
    }
 
    );
-   console.log(bl);
    */
 	// renderer
 	renderer = new THREE.WebGLRenderer();
@@ -309,7 +308,7 @@ function reinit() {
 }
 
 function onWindowResize() {
-	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.aspect = ( window.innerWidth * 0.6 ) / ( window.innerHeight * 0.9 );
 	camera.updateProjectionMatrix();
 
 	renderer.setSize(window.innerWidth*0.6, window.innerHeight*0.9);
@@ -325,10 +324,12 @@ function onDocumentMouseDown(event) {
 	var button = event.button;
 	console.log("Click.");
 	// console.log(velocity[0],velocity[1]);
-	mouse_click.x = ((event.clientX / (window.innerWidth)) * 2 - 1);
-	mouse_click.y = (-1 * (event.clientY / (window.innerHeight)) * 2 + 1);
+	mouse_click.x = (( event.clientX -395 ) / (window.innerWidth*0.6) * 2 - 1);
+	mouse_click.y = (-1 * (event.clientY - 28) /( window.innerHeight*0.9) * 2 + 1);
 	console.log(event.clientX);
 	console.log(event.clientY);
+	console.log(mouse_click.x);
+	console.log(mouse_click.y);
 
 	//move helicopter
 	raycaster.setFromCamera(mouse_click, camera);
@@ -370,7 +371,7 @@ function animate() {
 	BuffResetDetector(Date.now());
 	AutoGetBuff();
 	controls.update();
-	render_click();
+	move_helicopter();
 	requestAnimationFrame(animate);
 }
 function changeColor() {
@@ -598,20 +599,21 @@ function AutoGetBuff() {
 	}
 }
 
-function render_click() {
+function move_helicopter() {
 	//move helicopter
 	Time = Date.now();
-	var distance_init_dest = Math.hypot(destination[i].x - initialposition[i].x, destination[i].y - initialposition[i].y);
-	var distance_init_heli = Math.hypot(helicopter[i].position.x - initialposition[i].x, helicpter[i].position.y - initialposition[i].y);
+	var distance_init_dest = [];
+	var distance_init_heli = [];
 	for (var i = 0; i < 2; i++) {
-		if (distance_init_dest <= distance_init_heli ) {
+		distance_init_dest[i] = Math.hypot(destination[i].x - initialposition[i].x, destination[i].y - initialposition[i].y);
+		distance_init_heli[i] = Math.hypot(helicopter[i].position.x - initialposition[i].x, helicopter[i].position.y - initialposition[i].y);
+	if (distance_init_dest[i] <= distance_init_heli[i] ) {
 			helicopter[i].position.x = destination[i].x;
 			helicopter[i].position.y = destination[i].y;
 			move_or_not[i] = false;
-		} else if (move_or_not[i] == true) {
-			var distance = Math.hypot(destination[i].x - helicopter[i].position.x, destination[i].y - helicopter[i].position.y);
-			helicopter[i].position.x = initialposition[i].x + velocity[i] * (destination[i].x - helicopter[i].position.x) / distance * ( Time - time_init[i] )/1000;
-			helicopter[i].position.y = initialposition[i].y + velocity[i] * (destination[i].y - helicopter[i].position.y) / distance * ( Time - time_init[i] )/1000;
+		} else if (move_or_not[i] == true) {	
+			helicopter[i].position.x = initialposition[i].x + velocity[i] * (destination[i].x - initialposition[i].x) / distance_init_dest[i] * ( Time - time_init[i] )/1000;
+			helicopter[i].position.y = initialposition[i].y + velocity[i] * (destination[i].y - initialposition[i].y) / distance_init_dest[i] * ( Time - time_init[i] )/1000;
 		}
 	}
 	renderer.render(scene, camera);
