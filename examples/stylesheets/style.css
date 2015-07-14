@@ -1,0 +1,54 @@
+/* line 3, ../sass/style.sass */
+body {
+  margin: 0;
+}
+
+/* line 6, ../sass/style.sass */
+#main-wrapper {
+  display: flex;
+  flex-flow: row;
+  width: 100%;
+}
+
+/* line 11, ../sass/style.sass */
+#control-panel {
+  width: 20%;
+  background-color: #FFF;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  align-content: flex-start;
+  padding-top: 10px;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+/* line 22, ../sass/style.sass */
+#control-panel .control-panel-button {
+  width: 150px;
+  margin: 10px 0;
+}
+
+/* line 29, ../sass/style.sass */
+#main-canvas {
+  margin: 0 auto;
+  /*margin-top: 20px */
+  display: block;
+}
+
+/* line 34, ../sass/style.sass */
+#connect {
+  position: fixed;
+  top: 50;
+  left: 50;
+  z-index: 10;
+}
+
+/* line 40, ../sass/style.sass */
+#status {
+  position: fixed;
+  height: 50;
+  width: 200;
+  top: 50;
+  right: 50;
+  z-index: 10;
+}
