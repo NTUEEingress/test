@@ -103,22 +103,6 @@ function init() {
 	camera.rotation.set(1500, 0, 0);
 	console.log(camera);
 
-	controls = new THREE.TrackballControls(camera);
-
-	controls.rotateSpeed = 1.2;
-	controls.zoomSpeed = 1.0;
-	controls.panSpeed = 0.8;
-
-	controls.noZoom = false;
-	controls.noPan = false;
-
-	controls.staticMoving = true;
-	controls.dynamicDampingFactor = 0.3;
-
-	controls.keys = [65, 83, 68];
-
-	controls.addEventListener('change', render);
-
 	//score
 	scoreStartTime = Date.now();
 	gameStartTime = Date.now();
@@ -220,7 +204,7 @@ function init() {
 
 	// Misc
 	//mouse
-	document.addEventListener('mousedown', onDocumentMouseDown, false);
+	
 	projector = new THREE.Projector();
 
 	// lights
@@ -268,6 +252,25 @@ function init() {
 	renderer.domElement.setAttribute("id","main-canvas");
 	container = document.getElementById('canvas-wrapper');
 	container.appendChild(renderer.domElement);
+
+	var renderDOM = document.getElementById('main-canvas');
+	renderDOM.addEventListener('mousedown', onDocumentMouseDown, false);
+
+	controls = new THREE.TrackballControls(camera, renderDOM);
+
+	controls.rotateSpeed = 1.2;
+	controls.zoomSpeed = 1.0;
+	controls.panSpeed = 0.8;
+
+	controls.noZoom = false;
+	controls.noPan = false;
+
+	controls.staticMoving = true;
+	controls.dynamicDampingFactor = 0.3;
+
+	controls.keys = [65, 83, 68];
+
+	controls.addEventListener('change', render);
 
 	stats = new Stats();
 	stats.domElement.style.position = 'absolute';
@@ -322,8 +325,8 @@ function onDocumentMouseDown(event) {
 	var button = event.button;
 	console.log("Click.");
 	// console.log(velocity[0],velocity[1]);
-	mouse_click.x = ((event.clientX / (window.innerWidth)) * 2 - 1)*0.6;
-	mouse_click.y = (-1 * (event.clientY / (window.innerHeight)) * 2 + 1)*0.9;
+	mouse_click.x = ((event.clientX / (window.innerWidth)) * 2 - 1);
+	mouse_click.y = (-1 * (event.clientY / (window.innerHeight)) * 2 + 1);
 	console.log(event.clientX);
 	console.log(event.clientY);
 
@@ -612,8 +615,8 @@ function render_click() {
 		}
 	}
 	renderer.render(scene, camera);
-	console.log(destination[uid].x,destination[uid].y);
-	console.log(helicopter[uid].position.x,helicopter[uid].position.y);
+	//console.log(destination[uid].x,destination[uid].y);
+	//console.log(helicopter[uid].position.x,helicopter[uid].position.y);
 }
 function render() {
 	renderer.render(scene, camera);

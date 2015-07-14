@@ -41,7 +41,7 @@
 				  display: block;
 			}				
 			#Editor {
-				width: 20%;
+				width: 30%;
 				background-color: #FFF;
 				display: flex;
 				flex-flow: row wrap;
@@ -64,10 +64,14 @@
 	</head>
 	<body>
 	<div id = "main-wrapper">
-		<div id="Editor"></div>
-		<div class="card-panel">
-			<div id="canvas-wrapper">
+		<div id="Editor">
+			<form>
+				<textarea rows="30" cols="40"></textarea>
+				<input type="submit" value="Submit">
+			</form>
 		</div>
+		<div class="card-panel">
+			<div id="canvas-wrapper"></div>
 		</div>
 		<div id="info">
 			MOVE mouse &amp; click to occupy
