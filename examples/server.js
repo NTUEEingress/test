@@ -5,7 +5,7 @@ var express = require( 'express' ) ;
 var app = express() ;
 var cors = require('cors');
 
-app.use(express.static('../'));
+app.use(express.static('./'));
 app.use(cors());
 app.listen( 3000 ) ;
 
