@@ -4,6 +4,7 @@
 		<title>three.js webgl - trackball controls</title>
 		<meta charset="utf-8"/>
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
+		<link href="./stylesheets/materialize.css" type="text/css" rel="stylesheet"></link>
 		<style>
 			body {
 				color: #000;
@@ -28,6 +29,28 @@
 			a {
 				color: red;
 			}
+			#main-wrapper {
+				  display: flex;
+				  flex-flow: row;
+				  width: 100%;
+			}
+						
+			#main-canvas {
+				  margin: 0 auto;
+				  /*margin-top: 20px */
+				  display: block;
+			}				
+			#Editor {
+				width: 20%;
+				background-color: #FFF;
+				display: flex;
+				flex-flow: row wrap;
+				justify-content: space-between;
+				align-content: flex-start;
+				padding-top: 10px;
+				padding-left: 30px;
+				padding-right: 30px;
+			}
 		</style>
 		<script src="/conn.js"> </script>
 		<script src="/build/three.min.js"></script>
@@ -40,12 +63,18 @@
 
 	</head>
 	<body>
-		<div id="container"></div>
+	<div id = "main-wrapper">
+		<div id="Editor"></div>
+		<div class="card-panel">
+			<div id="canvas-wrapper">
+		</div>
+		</div>
 		<div id="info">
 			MOVE mouse &amp; click to occupy
 			<br/>Score : <font id="score"></font><button onclick="reinit()">Restart</button>
 			<br/>Gametime : <font id="gametime"></font>
 		</div>
+	</div>
 		<script src="/main.js"></script>
 	</body>
 </html>
