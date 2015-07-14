@@ -169,7 +169,7 @@ function init() {
 		scene.add(helicopter[i]);
 	}
 	var loader = new THREE.ColladaLoader();
-	loader.load('/examples/ar-drone-2.dae', function(result) {
+	loader.load('/ar-drone-2.dae', function(result) {
 		result.scene.scale.divideScalar(2);
 		console.log("=DDD");
 		helicopter.forEach(function(h) {
@@ -239,7 +239,7 @@ function init() {
 	//BL building
 	/*
    loader = new THREE.ColladaLoader();
-   loader.load('/examples/bl_model.dae',
+   loader.load('/bl_model.dae',
    function(result){
    result.scene.scale.divideScalar(0.01);
    bl = result.scene;
@@ -373,18 +373,19 @@ function changeColor() {
 				else if ( portalColor[ i ] < 0 ) portalColor[ i ] += delta ;
 			}
 		}
-		if ( portalColor[i] > -delta && portalColor[ i ] < delta ) controlled[ i ] = 100 ;
-		else if (portalColor[i] >= 300) portalColor[i] = 300 , controlled[i] = 0 ;
-		else if (portalColor[i] <= -300) portalColor[i] = -300 , controlled[i] = 1 ;
+		var tmpColor = Math.round( portalColor[ i ] ) ;
+		if ( tmpColor == 0 ) controlled[ i ] = 100 ;
+		else if ( tmpColor >= 300) tmpColor = 300 , portalColor[i] = 300 , controlled[i] = 0 ;
+		else if ( tmpColor <= -300) tmpColor = -300 , portalColor[i] = -300 , controlled[i] = 1 ;
 
-		if ( portalColor[i] > -delta && portalColor[ i ] < delta ) {
+		if ( tmpColor == 0 ) {
 			scene.children[i].material.color.setHex(0xffffff);
-		} else if ( portalColor[i] > delta ) {
-			scene.children[i].material.color.setHex(0xffffff - 0x000101 * Math.floor(portalColor[i] / 300 * 255));
-		} else if ( portalColor[i] < -delta ) {
-			scene.children[i].material.color.setHex(0xffffff - 0x010001 * Math.floor( -portalColor[i] / 300 * 255));
+		} else if ( tmpColor > 0 ) {
+			scene.children[i].material.color.setHex(0xffffff - 0x000101 * Math.floor( tmpColor / 300 * 255));
+		} else if ( tmpColor < 0 ) {
+			scene.children[i].material.color.setHex(0xffffff - 0x010001 * Math.floor( -tmpColor / 300 * 255));
 		}
-		setCircle(i, Math.floor(portalColor[i] / 300 * pieces));
+		setCircle(i, Math.round( tmpColor / 300 * pieces));
 	}
 }
 function setCircle(i, numOfSegment) {
