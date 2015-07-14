@@ -13,12 +13,9 @@ var mouse_move = new THREE.Vector2();
 //portal setting
 var num = 10;
 var nodeList = [];
-var x = [],
-y = [],
-z = 75;
+var x = [],y = [],z = 75;
 var portalColor = [];
-var radius = 40,
-sections = 180;
+var radius = 40, sections = 180;
 var ball_basic_color = 0xffffff;
 //uid setting { 0 , 1 }
 var uid;
@@ -601,8 +598,10 @@ function AutoGetBuff() {
 function render_click() {
 	//move helicopter
 	Time = Date.now();
+	var distance_init_dest = Math.hypot(destination[i].x - initialposition[i].x, destination[i].y - initialposition[i].y);
+	var distance_init_heli = Math.hypot(helicopter[i].position.x - initialposition[i].x, helicpter[i].position.y - initialposition[i].y);
 	for (var i = 0; i < 2; i++) {
-		if (Math.hypot(destination[i].x - helicopter[i].position.x, destination[i].y - helicopter[i].position.y) <= 20 ) {
+		if (distance_init_dest <= distance_init_heli ) {
 			helicopter[i].position.x = destination[i].x;
 			helicopter[i].position.y = destination[i].y;
 			move_or_not[i] = false;
