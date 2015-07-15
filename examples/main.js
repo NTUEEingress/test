@@ -386,8 +386,11 @@ function changeColor() {
 			if (controlled[i] == 0) portalColor[i] += delta;
 			else if (controlled[i] == 1) portalColor[i] -= delta;
 			else if (controlled[i] == 100) {
-				if (portalColor[i] > 0) portalColor[i] -= delta;
-				else if (portalColor[i] < 0) portalColor[i] += delta;
+				if(Math.abs(portalColor[i]) < delta)	portalColor[i] = 0;
+				else{
+					if (portalColor[i] > 0) portalColor[i] -= delta;
+					else if (portalColor[i] < 0) portalColor[i] += delta;
+				}
 			}
 		}
 		var tmpColor = Math.round(portalColor[i]);
