@@ -380,12 +380,17 @@ function changeColor() {
 		if (portalColor[i] > 0) originPositive = true;
 		else if (portalColor[i] < 0) originPositive = false;
 		for (var j = 0; j < 2; j++) {
-			if (Math.hypot(helicopter[j].position.x - x[i], helicopter[j].position.y - y[i]) < radius) nearPortal[j] = true;
+			if (Math.hypot(helicopter[j].position.x - x[i], helicopter[j].position.y - y[i]) < radius && ableToControl[j] >= 1) nearPortal[j] = true;
 		}
-		if (nearPortal[0] == true && nearPortal[1] == false) portalColor[i] += delta;
-		else if (nearPortal[0] == false && nearPortal[1] == true) portalColor[i] -= delta;
-		else if (nearPortal[0] == true && nearPortal[1] == true);
-		else if (nearPortal[0] == false && nearPortal[1] == false) {
+		if (nearPortal[0] == true){
+			if (controlSpeedUp[0])	portalColor[i] += 2 * delta;
+			else	portalColor[i] += delta;
+		}
+		if (nearPortal[1] == true){
+			if (controlSpeedUp[1])	portalColor[i] -= 2 * delta;
+			else	portalColor[i] -= delta;
+		}
+		if (nearPortal[0] == false && nearPortal[1] == false) {
 			if (controlled[i] == 0) portalColor[i] += delta;
 			else if (controlled[i] == 1) portalColor[i] -= delta;
 			else if (controlled[i] == 100) {
@@ -400,9 +405,14 @@ function changeColor() {
 		else if (portalColor[i] < 0) nowPositive = false;
 		var tmpColor = Math.round(portalColor[i]);
 		if (portalColor[i] == 0 || (originPositive && !nowPositive) || (!originPositive && nowPositive)) controlled[i] = 100;
-		else if (portalColor[i] >= 300) tmpColor = 300, portalColor[i] = 300, controlled[i] = 0;
-		else if (portalColor[i] <= - 300) tmpColor = - 300, portalColor[i] = - 300, controlled[i] = 1;
-
+		else if (portalColor[i] >= 300){
+			tmpColor = 300, portalColor[i] = 300, controlled[i] = 0;
+			getBuff(i, 0);
+		}
+		else if (portalColor[i] <= - 300){
+			tmpColor = - 300, portalColor[i] = - 300, controlled[i] = 1;
+			getBuff(i, 1);
+		}
 		if (tmpColor == 0) {
 			scene.children[i].material.color.setHex(0xffffff);
 		} else if (tmpColor > 0) {
@@ -456,19 +466,34 @@ function SetRandomPortal(i) {
 		buffDuration[i] = 60000;
 		buffExist[i] = true;
 		buffActivated[i] = - 1;
-	} else {
+	} 
+	else if (PortalEffect[i] == 4) {
 		buffDuration[i] = 0;
 		buffExist[i] = true;
 		buffActivated[i] = - 1;
 	}
-
+	else if (PortalEffect[i] == 5) {
+		buffDuration[i] = 0;
+		buffExist[i] = true;
+		buffActivated[i] = - 1;
+	} 
+	else if (PortalEffect[i] == 6) {
+		buffDuration[i] = 30000;
+		buffExist[i] = true;
+		buffActivated[i] = - 1;
+	} 
+	else if (PortalEffect[i] == 7) {
+		buffDuration[i] = 30000;
+		buffExist[i] = true;
+		buffActivated[i] = - 1;
+	}
 }
 function SetPortalEffect() {
 	//Speed Buff
 	PortalEffect[0] = - 1;
 	PortalEffect[1] = 0;
 	PortalEffect[2] = 0;
-	PortalEffect[3] = 0;
+	PortalEffect[3] = 0; //-1: random, 0: speed buff, 1: score buff, 2: 100 points, 3: speed up control
 	PortalEffect[4] = 0; //effect 0~3, reset all portals, remove all buffs, cannot control, enemy cannot control
 	/*
 	   PortalEffect[1] = 0;
@@ -477,7 +502,7 @@ function SetPortalEffect() {
 	   PortalEffect[4] = 3;
 	   */
 	controlSpeedUp = [false, false];
-	ableToControl = [true, true];
+	ableToControl = [1, 1]; // if small than 1, it can't control portals
 	for (var i = 0; i < num; i++) {
 		isRandom[i] = false;
 		if (PortalEffect[i] == - 1) {
@@ -552,15 +577,17 @@ function getBuff(i, j) {
 			buffExist[i] = false;
 		}
 		else if (PortalEffect[i] == 6) {
-			ableToControl[j] = false;
+			ableToControl[j] --;
 			buffStartTime[i] = Date.now();
 			buffExist[i] = false;
+			buffActivated[i] = j;
 		}
 		else if (PortalEffect[i] == 7) {
-			if (j == 0) ableToControl[1] = false;
-			else ableToControl[0] = false;
+			if (j == 0) ableToControl[1] --;
+			else ableToControl[0] --;
 			buffStartTime[i] = Date.now();
 			buffExist[i] = false;
+			buffActivated[i] = j;
 		}
 	}
 }
@@ -578,6 +605,15 @@ function BuffDetector(dateNow) {
 			}
 			if (PortalEffect[i] == 3 && (dateNow - buffStartTime[i] > buffDuration[i])) {
 				controlSpeedUp[buffActivated[i]] = false;
+				buffActivated[i] = - 1;
+			}
+			if (PortalEffect[i] == 6 && (dateNow - buffStartTime[i] > buffDuration[i])) {
+				ableToControl[buffActivated[i]] ++;
+				buffActivated[i] = - 1;
+			}
+			if (PortalEffect[i] == 7 && (dateNow - buffStartTime[i] > buffDuration[i])) {
+				if(buffActivated[i] == 0)	ableToControl[1] ++;
+				else if(buffActivated[i] == 1)	ableToControl[0] ++;
 				buffActivated[i] = - 1;
 			}
 		}
