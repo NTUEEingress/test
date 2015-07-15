@@ -13,9 +13,12 @@ var mouse_move = new THREE.Vector2();
 //portal setting
 var num = 10;
 var nodeList = [];
-var x = [],y = [],z = 75;
+var x = [],
+y = [],
+z = 75;
 var portalColor = [];
-var radius = 40, sections = 180;
+var radius = 40,
+sections = 180;
 var ball_basic_color = 0xffffff;
 //uid setting { 0 , 1 }
 var uid;
@@ -89,7 +92,7 @@ function start() {
 	uid = parseInt(prompt('enter your uid'));
 	if (uid == 1) {
 		var BEGIN = new CustomEvent('BEGIN', {
-			'detail': 100
+			'detail': -1
 		});
 		console.log(BEGIN);
 		window.dispatchEvent(BEGIN);
@@ -98,7 +101,7 @@ function start() {
 
 function init() {
 	// camera
-	camera = new THREE.PerspectiveCamera(60, (window.innerWidth*0.6) / (window.innerHeight*0.9), 1, 20000);
+	camera = new THREE.PerspectiveCamera(60, (window.innerWidth * 0.6) / (window.innerHeight * 0.9), 1, 20000);
 	camera.position.set(0, - 800, 1000);
 	camera.rotation.set(1500, 0, 0);
 	console.log(camera);
@@ -126,7 +129,7 @@ function init() {
 		mesh_circle.position.x = x[i];
 		mesh_circle.position.y = y[i];
 		mesh_circle.position.z = z;
-		console.log(mesh_circle.position);	
+		console.log(mesh_circle.position);
 		controlled[i] = 100;
 		portalColor[i] = 0;
 		scene.add(mesh_circle);
@@ -169,11 +172,11 @@ function init() {
 	destination[1] = new THREE.Vector2(x[0], y[0]);
 	initialposition[0] = new THREE.Vector2(x[0], y[0]);
 	initialposition[1] = new THREE.Vector2(x[0], y[0]);
-	for(var i=0;i<2;i++){
+	for (var i = 0; i < 2; i++) {
 		destination[i].x = x[0];
 		destination[i].y = y[0];
-		initialposition[i].x = x[0] ;
-		initialposition[i].y = y[0] ;
+		initialposition[i].x = x[0];
+		initialposition[i].y = y[0];
 	}
 	//Timer(outline) init
 	for (var i = 0; i < num; i++) {
@@ -224,25 +227,25 @@ function init() {
 	scene.add(line);
 
 	//BL building
-	
-   loader = new THREE.ColladaLoader();
-   loader.load('/blmodel.dae',
-   function(result){
-   result.scene.scale.divideScalar(0.01);
-   bl = result.scene;
-   scene.add(bl);
-   bl.position.set(-1500,0,0);
-   render();
-   }
-	
-   );
+	/*
+	loader = new THREE.ColladaLoader();
+	loader.load('/blmodel.dae', function(result) {
+		result.scene.scale.divideScalar(0.01);
+		bl = result.scene;
+		scene.add(bl);
+		bl.position.set( - 1500, 0, 0);
+		render();
+	}
+
+	);
+	*/
 	// renderer
 	renderer = new THREE.WebGLRenderer();
 	renderer.setClearColor(scene.fog.color);
 	renderer.setPixelRatio(window.devicePixelRatio);
-	renderer.setSize(window.innerWidth*0.6, window.innerHeight*0.9);
-	
-	renderer.domElement.setAttribute("id","main-canvas");
+	renderer.setSize(window.innerWidth * 0.6, window.innerHeight * 0.9);
+
+	renderer.domElement.setAttribute("id", "main-canvas");
 	container = document.getElementById('canvas-wrapper');
 	container.appendChild(renderer.domElement);
 
@@ -290,7 +293,7 @@ function reinit() {
 		helicopter[i].position.y = y[0];
 		destination[i].x = x[0];
 		destination[i].y = y[0];
-		velocity[i] = 5;
+		velocity[i] = 50;
 
 	}
 	score = [0, 0];
@@ -302,10 +305,10 @@ function reinit() {
 }
 
 function onWindowResize() {
-	camera.aspect = ( window.innerWidth * 0.6 ) / ( window.innerHeight * 0.9 );
+	camera.aspect = (window.innerWidth * 0.6) / (window.innerHeight * 0.9);
 	camera.updateProjectionMatrix();
 
-	renderer.setSize(window.innerWidth*0.6, window.innerHeight*0.9);
+	renderer.setSize(window.innerWidth * 0.6, window.innerHeight * 0.9);
 
 	controls.handleResize();
 
@@ -318,8 +321,8 @@ function onDocumentMouseDown(event) {
 	var button = event.button;
 	console.log("Click.");
 	// console.log(velocity[0],velocity[1]);
-	mouse_click.x = (( event.clientX - window.innerWidth*0.3 - 20 ) / (window.innerWidth*0.6) * 2 - 1);
-	mouse_click.y = (-1 * (event.clientY - 28) /( window.innerHeight*0.9) * 2 + 1);
+	mouse_click.x = ((event.clientX - window.innerWidth * 0.3 - 20) / (window.innerWidth * 0.6) * 2 - 1);
+	mouse_click.y = ( - 1 * (event.clientY - 28) / (window.innerHeight * 0.9) * 2 + 1);
 	console.log(event.clientX);
 	console.log(event.clientY);
 	console.log(mouse_click.x);
@@ -330,15 +333,11 @@ function onDocumentMouseDown(event) {
 	var intersect_click = raycaster.intersectObjects(nodeList);
 
 	if (intersect_click.length > 0) {
-		time_init[uid] = Date.now();
-		initialposition[uid].x = helicopter[uid].position.x;
-		initialposition[uid].y = helicopter[uid].position.y;
-		destination[uid].x = intersect_click[0].object.position.x;
-		destination[uid].y = intersect_click[0].object.position.y;
-			for (var i = 0; i < num; i++) {
+		var timeInit = Math.floor( Date.now() ) ;
+		for (var i = 0; i < num; i++) {
 			if (x[i] == intersect_click[0].object.position.x && y[i] == intersect_click[0].object.position.y) {
 				var mouseclick = new CustomEvent('mouseclick', {
-					'detail': uid * 10 + i
+					'detail': timeInit * 100 + uid * 10 + i
 				});
 				console.log(mouseclick);
 				window.dispatchEvent(mouseclick);
@@ -346,14 +345,17 @@ function onDocumentMouseDown(event) {
 			}
 		}
 	}
-	console.log(destination[uid].x,destination[uid].y);
+	console.log(destination[uid].x, destination[uid].y);
 }
 
-function receiveMouseEvent(uid, portalid) {
+function receiveMouseEvent(uid, portalid, timeInit) {
 	//helicopter move or not
 	console.log(portalid);
+	initialposition[uid].x = helicopter[uid].position.x;
+	initialposition[uid].y = helicopter[uid].position.y;
 	destination[uid].x = scene.children[portalid].position.x;
 	destination[uid].y = scene.children[portalid].position.y;
+	time_init[ uid ] = timeInit ;
 	move_or_not[uid] = true;
 }
 
@@ -375,38 +377,37 @@ function changeColor() {
 	for (var i = 0; i < num; i++) {
 		var nearPortal = [false, false];
 		for (var j = 0; j < 2; j++) {
-			if (Math.hypot(helicopter[j].position.x - x[i], helicopter[j].position.y - y[i]) < radius )
-				nearPortal[j] = true;
+			if (Math.hypot(helicopter[j].position.x - x[i], helicopter[j].position.y - y[i]) < radius) nearPortal[j] = true;
 		}
-		if ( nearPortal[ 0 ] == true && nearPortal[ 1 ] == false ) portalColor[ i ] += delta ;
-		else if ( nearPortal[ 0 ] == false && nearPortal[ 1 ] == true ) portalColor[ i ] -= delta ;
-		else if ( nearPortal[ 0 ] == true && nearPortal[ 1 ] == true ) ;
-		else if ( nearPortal[ 0 ] == false && nearPortal[ 1 ] == false ) {
-			if ( controlled[ i ] == 0 ) portalColor[ i ] += delta ;
-			else if ( controlled[ i ] == 1 ) portalColor[ i ] -= delta ;
-			else if ( controlled[ i ] == 100 ) {
-				if ( portalColor[ i ] > 0 ) portalColor[ i ] -= delta ;
-				else if ( portalColor[ i ] < 0 ) portalColor[ i ] += delta ;
+		if (nearPortal[0] == true && nearPortal[1] == false) portalColor[i] += delta;
+		else if (nearPortal[0] == false && nearPortal[1] == true) portalColor[i] -= delta;
+		else if (nearPortal[0] == true && nearPortal[1] == true);
+		else if (nearPortal[0] == false && nearPortal[1] == false) {
+			if (controlled[i] == 0) portalColor[i] += delta;
+			else if (controlled[i] == 1) portalColor[i] -= delta;
+			else if (controlled[i] == 100) {
+				if (portalColor[i] > 0) portalColor[i] -= delta;
+				else if (portalColor[i] < 0) portalColor[i] += delta;
 			}
 		}
-		var tmpColor = Math.round( portalColor[ i ] ) ;
-		if ( tmpColor == 0 ) controlled[ i ] = 100 ;
-		else if ( tmpColor >= 300) tmpColor = 300 , portalColor[i] = 300 , controlled[i] = 0 ;
-		else if ( tmpColor <= -300) tmpColor = -300 , portalColor[i] = -300 , controlled[i] = 1 ;
+		var tmpColor = Math.round(portalColor[i]);
+		if (tmpColor == 0) controlled[i] = 100;
+		else if (tmpColor >= 300) tmpColor = 300, portalColor[i] = 300, controlled[i] = 0;
+		else if (tmpColor <= - 300) tmpColor = - 300, portalColor[i] = - 300, controlled[i] = 1;
 
-		if ( tmpColor == 0 ) {
+		if (tmpColor == 0) {
 			scene.children[i].material.color.setHex(0xffffff);
-		} else if ( tmpColor > 0 ) {
-			scene.children[i].material.color.setHex(0xffffff - 0x000101 * Math.floor( tmpColor / 300 * 255));
-		} else if ( tmpColor < 0 ) {
-			scene.children[i].material.color.setHex(0xffffff - 0x010001 * Math.floor( -tmpColor / 300 * 255));
+		} else if (tmpColor > 0) {
+			scene.children[i].material.color.setHex(0xffffff - 0x000101 * Math.floor(tmpColor / 300 * 255));
+		} else if (tmpColor < 0) {
+			scene.children[i].material.color.setHex(0xffffff - 0x010001 * Math.floor( - tmpColor / 300 * 255));
 		}
-		setCircle(i, Math.round( tmpColor / 300 * pieces));
+		setCircle(i, Math.round(tmpColor / 300 * pieces));
 	}
 }
 function setCircle(i, numOfSegment) {
-	if ( numOfSegment > pieces ) numOfSegment = pieces;
-	else if ( numOfSegment < -pieces ) numOfSegment = -pieces ;
+	if (numOfSegment > pieces) numOfSegment = pieces;
+	else if (numOfSegment < - pieces) numOfSegment = - pieces;
 	for (var j = 0; j < Math.abs(numOfSegment); j++) {
 		if (numOfSegment > 0) {
 			circleSegment[i][j].material.visible = true;
@@ -601,13 +602,13 @@ function move_helicopter() {
 	for (var i = 0; i < 2; i++) {
 		distance_init_dest[i] = Math.hypot(destination[i].x - initialposition[i].x, destination[i].y - initialposition[i].y);
 		distance_init_heli[i] = Math.hypot(helicopter[i].position.x - initialposition[i].x, helicopter[i].position.y - initialposition[i].y);
-	if (distance_init_dest[i] <= distance_init_heli[i] ) {
+		if (distance_init_dest[i] <= distance_init_heli[i]) {
 			helicopter[i].position.x = destination[i].x;
 			helicopter[i].position.y = destination[i].y;
 			move_or_not[i] = false;
-		} else if (move_or_not[i] == true) {	
-			helicopter[i].position.x = initialposition[i].x + velocity[i] * (destination[i].x - initialposition[i].x) / distance_init_dest[i] * ( Time - time_init[i] )/1000;
-			helicopter[i].position.y = initialposition[i].y + velocity[i] * (destination[i].y - initialposition[i].y) / distance_init_dest[i] * ( Time - time_init[i] )/1000;
+		} else if (move_or_not[i] == true) {
+			helicopter[i].position.x = initialposition[i].x + velocity[i] * (destination[i].x - initialposition[i].x) / distance_init_dest[i] * (Time - time_init[i]) / 1000;
+			helicopter[i].position.y = initialposition[i].y + velocity[i] * (destination[i].y - initialposition[i].y) / distance_init_dest[i] * (Time - time_init[i]) / 1000;
 		}
 	}
 	renderer.render(scene, camera);
