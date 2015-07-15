@@ -376,6 +376,9 @@ function changeColor() {
 	colorCountTime = TimeNow;
 	for (var i = 0; i < num; i++) {
 		var nearPortal = [false, false];
+		var originPositive, nowPositive;
+		if (portalColor[i] > 0) originPositive = true;
+		else if (portalColor[i] < 0) originPositive = false;
 		for (var j = 0; j < 2; j++) {
 			if (Math.hypot(helicopter[j].position.x - x[i], helicopter[j].position.y - y[i]) < radius) nearPortal[j] = true;
 		}
@@ -386,17 +389,19 @@ function changeColor() {
 			if (controlled[i] == 0) portalColor[i] += delta;
 			else if (controlled[i] == 1) portalColor[i] -= delta;
 			else if (controlled[i] == 100) {
-				if(Math.abs(portalColor[i]) < delta)	portalColor[i] = 0;
+				if (Math.abs(portalColor[i]) < delta)	portalColor[i] = 0;
 				else{
 					if (portalColor[i] > 0) portalColor[i] -= delta;
 					else if (portalColor[i] < 0) portalColor[i] += delta;
 				}
 			}
 		}
+		if (portalColor[i] > 0) nowPositive = true;
+		else if (portalColor[i] < 0) nowPositive = false;
 		var tmpColor = Math.round(portalColor[i]);
-		if (tmpColor == 0) controlled[i] = 100;
-		else if (tmpColor >= 300) tmpColor = 300, portalColor[i] = 300, controlled[i] = 0;
-		else if (tmpColor <= - 300) tmpColor = - 300, portalColor[i] = - 300, controlled[i] = 1;
+		if (portalColor[i] == 0 || (originPositive && !nowPositive) || (!originPositive && nowPositive)) controlled[i] = 100;
+		else if (portalColor[i] >= 300) tmpColor = 300, portalColor[i] = 300, controlled[i] = 0;
+		else if (portalColor[i] <= - 300) tmpColor = - 300, portalColor[i] = - 300, controlled[i] = 1;
 
 		if (tmpColor == 0) {
 			scene.children[i].material.color.setHex(0xffffff);
@@ -405,7 +410,7 @@ function changeColor() {
 		} else if (tmpColor < 0) {
 			scene.children[i].material.color.setHex(0xffffff - 0x010001 * Math.floor( - tmpColor / 300 * 255));
 		}
-		setCircle(i, Math.round(tmpColor / 300 * pieces));
+		setCircle(i, Math.round(portalColor[i] / 300 * pieces));
 	}
 }
 function setCircle(i, numOfSegment) {
