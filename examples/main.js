@@ -153,6 +153,7 @@ function init() {
 
 		scene.add(helicopter[i]);
 	}
+	// load BL Building
 	var loader = new THREE.ColladaLoader();
 	loader.load('/ar-drone-2.dae', function(result) {
 		result.scene.scale.divideScalar(2);
@@ -233,9 +234,14 @@ function init() {
    scene.add(bl);
    bl.position.set(-1500,0,0);
    render();
-   }
-	
-   );
+   }	
+   // Buff Hints
+   var material_speedup = new THREE.MeshLambertMaterial({
+        map: THREE.ImageUtils.loadTexture('cross.jpg')
+      }); 
+   var cube_speedup = new THREE.Mesh(new CubeGeometry(20, 20, 20), material_speedup);
+   cube_speedup.overdraw = true;
+   scene.add(cube_speedup);
 	// renderer
 	renderer = new THREE.WebGLRenderer();
 	renderer.setClearColor(scene.fog.color);
@@ -320,16 +326,13 @@ function onDocumentMouseDown(event) {
 	// console.log(velocity[0],velocity[1]);
 	mouse_click.x = (( event.clientX - window.innerWidth*0.3 - 20 ) / (window.innerWidth*0.6) * 2 - 1);
 	mouse_click.y = (-1 * (event.clientY - 28) /( window.innerHeight*0.9) * 2 + 1);
-	console.log(event.clientX);
-	console.log(event.clientY);
-	console.log(mouse_click.x);
-	console.log(mouse_click.y);
 
 	//move helicopter
 	raycaster.setFromCamera(mouse_click, camera);
 	var intersect_click = raycaster.intersectObjects(nodeList);
 
 	if (intersect_click.length > 0) {
+		console.log(intersect_click[0]);
 		time_init[uid] = Date.now();
 		initialposition[uid].x = helicopter[uid].position.x;
 		initialposition[uid].y = helicopter[uid].position.y;
@@ -340,7 +343,6 @@ function onDocumentMouseDown(event) {
 				var mouseclick = new CustomEvent('mouseclick', {
 					'detail': uid * 10 + i
 				});
-				console.log(mouseclick);
 				window.dispatchEvent(mouseclick);
 				break;
 			}
