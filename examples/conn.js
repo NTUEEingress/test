@@ -21,8 +21,8 @@ connection.onopen = function () {
 	connection.onmessage = function (event) {
 		var tmp = parseInt( event.data ) ;
 		console.log( tmp ) ;
-		if ( tmp < 100 ) {
-			receiveMouseEvent( Math.floor( tmp / 10 ) , tmp % 10 ) ;
+		if ( tmp != -1 ) {
+			receiveMouseEvent( Math.floor( ( tmp % 100 ) / 10 ) , tmp % 10 , Math.floor( tmp / 100 ) ) ;
 		} else {
 			reinit();
 			console.log("SYNCRONOUS");
